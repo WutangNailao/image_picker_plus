@@ -6,9 +6,9 @@
 import 'dart:async' as _i4;
 
 import 'package:cross_file/cross_file.dart' as _i5;
-import 'package:image_picker_platform_interface/src/platform_interface/image_picker_platform.dart'
+import 'package:image_picker_plus_platform_interface/src/platform_interface/image_picker_plus_platform.dart'
     as _i3;
-import 'package:image_picker_platform_interface/src/types/types.dart' as _i2;
+import 'package:image_picker_plus_platform_interface/src/types/types.dart' as _i2;
 import 'package:mockito/mockito.dart' as _i1;
 
 // ignore_for_file: type=lint
