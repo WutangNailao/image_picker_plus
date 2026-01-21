@@ -7,11 +7,11 @@ import 'dart:async';
 import 'package:file_selector_platform_interface/file_selector_platform_interface.dart';
 import 'package:file_selector_windows/file_selector_windows.dart';
 import 'package:flutter/foundation.dart';
-import 'package:image_picker_platform_interface/image_picker_platform_interface.dart';
+import 'package:image_picker_plus_platform_interface/image_picker_plus_platform_interface.dart';
 
 /// The Windows implementation of [ImagePickerPlatform].
 ///
-/// This class implements the `package:image_picker` functionality for
+/// This class implements the `package:image_picker_plus` functionality for
 /// Windows.
 class ImagePickerWindows extends CameraDelegatingImagePickerPlatform {
   /// Constructs a ImagePickerWindows.

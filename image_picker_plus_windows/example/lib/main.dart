@@ -8,7 +8,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:image_picker_platform_interface/image_picker_platform_interface.dart';
+import 'package:image_picker_plus_platform_interface/image_picker_plus_platform_interface.dart';
 import 'package:mime/mime.dart';
 import 'package:video_player/video_player.dart';
 

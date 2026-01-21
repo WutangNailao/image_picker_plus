@@ -1,6 +1,6 @@
-# image\_picker\_windows
+# image\_picker\_plus\_windows
 
-A Windows implementation of [`image_picker`][1].
+A Windows implementation of [`image_picker_plus`][1].
 
 ## Limitations
 
@@ -16,12 +16,11 @@ The argument `maxDuration` is not currently supported.
 
 ### Import the package
 
-This package is [endorsed][2], which means you can simply use `file_selector`
-normally. This package will be automatically included in your app when you do,
-so you do not need to add it to your `pubspec.yaml`.
+Most apps should depend on `image_picker_plus` rather than this package
+directly. This package is pulled in automatically when you use
+`image_picker_plus`.
 
 However, if you `import` this package to use any of its APIs directly, you
 should add it to your `pubspec.yaml` as usual.
 
-[1]: https://pub.dev/packages/image_picker
-[2]: https://flutter.dev/to/endorsed-federated-plugin
+[1]: https://pub.dev/packages/image_picker_plus
