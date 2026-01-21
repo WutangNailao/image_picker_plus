@@ -1,6 +1,6 @@
-# image\_picker\_macos
+# image\_picker\_plus\_macos
 
-A macOS implementation of [`image_picker`][1].
+A macOS implementation of [`image_picker_plus`][1].
 
 ## Limitations
 
@@ -18,9 +18,9 @@ The argument `maxDuration` is not currently supported.
 
 ### Import the package
 
-This package is [endorsed][2], which means you can simply use `image_picker`
-normally. This package will be automatically included in your app when you do,
-so you do not need to add it to your `pubspec.yaml`.
+Most apps should depend on `image_picker_plus` rather than this package
+directly. This package is pulled in automatically when you use
+`image_picker_plus`.
 
 However, if you `import` this package to use any of its APIs directly, you
 should add it to your `pubspec.yaml` as usual.
@@ -41,8 +41,7 @@ available in newer versions of macOS, which is more similar to the iOS
 experience, you may want to consider using
 [an alternate, unendorsed implementation built by the community][5].
 
-[1]: https://pub.dev/packages/image_picker
-[2]: https://flutter.dev/to/endorsed-federated-plugin
+[1]: https://pub.dev/packages/image_picker_plus
 [3]: https://pub.dev/packages/file_selector
 [4]: https://flutter.dev/to/macos-entitlements
 [5]: https://pub.dev/packages?q=topic%3Aimage-picker+platform%3Amacos

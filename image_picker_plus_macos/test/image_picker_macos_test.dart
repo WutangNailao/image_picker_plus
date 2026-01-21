@@ -4,8 +4,8 @@
 
 import 'package:file_selector_platform_interface/file_selector_platform_interface.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:image_picker_macos/image_picker_macos.dart';
-import 'package:image_picker_platform_interface/image_picker_platform_interface.dart';
+import 'package:image_picker_plus_macos/image_picker_macos.dart';
+import 'package:image_picker_plus_platform_interface/image_picker_plus_platform_interface.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 

@@ -1,8 +1,8 @@
-name: image_picker_macos
-description: macOS platform implementation of image_picker
-repository: https://github.com/flutter/packages/tree/main/packages/image_picker/image_picker_macos
-issue_tracker: https://github.com/flutter/flutter/issues?q=is%3Aissue+is%3Aopen+label%3A%22p%3A+image_picker%22
-version: 0.2.2+1
+name: image_picker_plus_macos
+description: macOS platform implementation of image_picker_plus
+repository: https://github.com/WutangNailao/image_picker_plus
+issue_tracker: https://github.com/WutangNailao/image_picker_plus/issues
+version: 0.0.1
 
 environment:
   sdk: ^3.9.0
@@ -10,7 +10,7 @@ environment:
 
 flutter:
   plugin:
-    implements: image_picker
+    implements: image_picker_plus
     platforms:
       macos:
         dartPluginClass: ImagePickerMacOS
@@ -20,7 +20,7 @@ dependencies:
   file_selector_platform_interface: ^2.3.0
   flutter:
     sdk: flutter
-  image_picker_platform_interface: ^2.11.0
+  image_picker_plus_platform_interface: ^0.0.1
 
 dev_dependencies:
   build_runner: ^2.1.5
