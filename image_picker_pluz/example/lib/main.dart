@@ -242,31 +242,41 @@ class _MyHomePageState extends State<MyHomePage> {
         child: ListView.builder(
           key: UniqueKey(),
           itemBuilder: (BuildContext context, int index) {
-            final String? mime = lookupMimeType(_mediaFileList![index].path);
+            final XFile image = _mediaFileList![index];
+            final String? mime = lookupMimeType(image.path);
 
             // Why network for web?
             // See https://pub.dev/packages/image_picker_for_web#limitations-on-the-web-platform
-            return Semantics(
-              label: 'image_picker_example_picked_image',
-              child: kIsWeb
-                  ? Image.network(_mediaFileList![index].path)
-                  : (mime == null || mime.startsWith('image/')
-                        ? Image.file(
-                            File(_mediaFileList![index].path),
-                            errorBuilder:
-                                (
-                                  BuildContext context,
-                                  Object error,
-                                  StackTrace? stackTrace,
-                                ) {
-                                  return const Center(
-                                    child: Text(
-                                      'This image type is not supported',
-                                    ),
-                                  );
-                                },
-                          )
-                        : _buildInlineVideoPlayer(index)),
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Text(
+                  _formatPickedLabel(image),
+                  key: const Key('image_picker_example_picked_image_name'),
+                ),
+                Semantics(
+                  label: 'image_picker_example_picked_image',
+                  child: kIsWeb
+                      ? Image.network(_mediaFileList![index].path)
+                      : (mime == null || mime.startsWith('image/')
+                            ? Image.file(
+                                File(_mediaFileList![index].path),
+                                errorBuilder:
+                                    (
+                                      BuildContext context,
+                                      Object error,
+                                      StackTrace? stackTrace,
+                                    ) {
+                                      return const Center(
+                                        child: Text(
+                                          'This image type is not supported',
+                                        ),
+                                      );
+                                    },
+                              )
+                            : _buildInlineVideoPlayer(index)),
+                ),
+              ],
             );
           },
           itemCount: _mediaFileList!.length,
@@ -577,6 +587,20 @@ class _MyHomePageState extends State<MyHomePage> {
         );
       },
     );
+  }
+
+  String _formatPickedLabel(XFile file) {
+    if (file is XFileWithMetadata) {
+      final parts = <String>[file.name];
+      if (file.localIdentifier != null) {
+        parts.add('iOS: ${file.localIdentifier}');
+      }
+      if (file.contentUri != null) {
+        parts.add('Android: ${file.contentUri}');
+      }
+      return parts.join(' ');
+    }
+    return file.name;
   }
 }
 

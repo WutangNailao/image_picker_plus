@@ -15,6 +15,7 @@ export 'package:image_picker_plus_platform_interface/image_picker_plus_platform_
         PickedFile,
         RetrieveType,
         XFile,
+        XFileWithMetadata,
         kTypeImage,
         kTypeVideo;
 
