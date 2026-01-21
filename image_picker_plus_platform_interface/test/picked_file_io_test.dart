@@ -10,7 +10,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:image_picker_platform_interface/image_picker_platform_interface.dart';
+import 'package:image_picker_plus_platform_interface/image_picker_plus_platform_interface.dart';
 
 final String pathPrefix = Directory.current.path.endsWith('test')
     ? './assets/'

@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:image_picker_platform_interface/src/types/types.dart';
+import 'package:image_picker_plus_platform_interface/src/types/types.dart';
 
 void main() {
   group('MediaOptions', () {

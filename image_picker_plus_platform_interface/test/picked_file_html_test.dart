@@ -10,7 +10,7 @@ import 'dart:js_interop';
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:image_picker_platform_interface/image_picker_platform_interface.dart';
+import 'package:image_picker_plus_platform_interface/image_picker_plus_platform_interface.dart';
 import 'package:web/web.dart' as web;
 
 const String expectedStringContents = 'Hello, world!';
