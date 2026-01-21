@@ -3,9 +3,17 @@
 // found in the LICENSE file.
 
 import 'package:flutter/services.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:image_picker_plus/image_picker_plus.dart';
 // #docregion CameraDelegate
-import 'package:image_picker_platform_interface/image_picker_platform_interface.dart';
+import 'package:image_picker_plus_platform_interface/image_picker_plus_platform_interface.dart'
+    hide
+        CameraDevice,
+        ImageSource,
+        LostData,
+        LostDataResponse,
+        PickedFile,
+        RetrieveType,
+        XFile;
 // #enddocregion CameraDelegate
 
 /// Example of a camera delegate

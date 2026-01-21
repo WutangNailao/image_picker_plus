@@ -1,13 +1,6 @@
 .fvm/
 /**/.fvm/
 
-# iOS and macOS dependencies
-.build/
-Podfile.lock
-Pods/
-.swiftpm/
-.symlinks/
-
 # Generated files on example apps
 flutter_export_environment.sh
 .flutter-plugins*

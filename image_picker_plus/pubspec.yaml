@@ -28,9 +28,9 @@ flutter:
 dependencies:
   flutter:
     sdk: flutter
-  image_picker_plus_android: ^0.0.1
+  image_picker_plus_android: ^0.0.2
   image_picker_plus_for_web: ^0.0.1
-  image_picker_plus_ios: ^0.0.1
+  image_picker_plus_ios: ^0.0.2
   image_picker_plus_linux: ^0.0.1
   image_picker_plus_macos: ^0.0.1
   image_picker_plus_platform_interface: ^0.0.1
