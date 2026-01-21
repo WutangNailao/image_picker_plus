@@ -1,3 +1,9 @@
+## 0.0.1
+
+* Initial release of `image_picker_plus_for_web`.
+* Forked from `image_picker_for_web` v3.1.1.
+* Renamed package from `image_picker_for_web` to `image_picker_plus_for_web`.
+
 ## 3.1.1
 
 * Uses `CanvasRenderingContext2D.drawImage` instead of the deprecated `drawImageScaled`.

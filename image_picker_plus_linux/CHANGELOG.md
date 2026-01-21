@@ -1,6 +1,8 @@
-## NEXT
+## 0.0.1
 
-* Updates minimum supported SDK version to Flutter 3.32/Dart 3.8.
+* Initial release of `image_picker_plus_linux`.
+* Forked from `image_picker_linux` v0.2.2.
+* Renamed package from `image_picker_linux` to `image_picker_plus_linux`.
 
 ## 0.2.2
 
