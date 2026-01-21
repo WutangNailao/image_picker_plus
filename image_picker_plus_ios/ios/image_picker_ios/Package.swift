@@ -7,18 +7,19 @@
 import PackageDescription
 
 let package = Package(
-  name: "image_picker_ios",
+  name: "image_picker_plus_ios",
   platforms: [
     .iOS("13.0")
   ],
   products: [
-    .library(name: "image-picker-ios", targets: ["image_picker_ios"])
+    .library(name: "image-picker-plus-ios", targets: ["image_picker_plus_ios"])
   ],
   dependencies: [],
   targets: [
     .target(
-      name: "image_picker_ios",
+      name: "image_picker_plus_ios",
       dependencies: [],
+      path: "Sources/image_picker_ios",
       exclude: ["include/image_picker_ios-umbrella.h", "include/ImagePickerPlugin.modulemap"],
       resources: [
         .process("Resources")

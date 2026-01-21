@@ -250,7 +250,7 @@ class ImagePickerApi {
     bool requestFullMetadata,
   ) async {
     final String pigeonVar_channelName =
-        'dev.flutter.pigeon.image_picker_ios.ImagePickerApi.pickImage$pigeonVar_messageChannelSuffix';
+        'dev.flutter.pigeon.image_picker_plus_ios.ImagePickerApi.pickImage$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel =
         BasicMessageChannel<Object?>(
           pigeonVar_channelName,
@@ -282,7 +282,7 @@ class ImagePickerApi {
     int? limit,
   ) async {
     final String pigeonVar_channelName =
-        'dev.flutter.pigeon.image_picker_ios.ImagePickerApi.pickMultiImage$pigeonVar_messageChannelSuffix';
+        'dev.flutter.pigeon.image_picker_plus_ios.ImagePickerApi.pickMultiImage$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel =
         BasicMessageChannel<Object?>(
           pigeonVar_channelName,
@@ -317,7 +317,7 @@ class ImagePickerApi {
     int? maxDurationSeconds,
   ) async {
     final String pigeonVar_channelName =
-        'dev.flutter.pigeon.image_picker_ios.ImagePickerApi.pickVideo$pigeonVar_messageChannelSuffix';
+        'dev.flutter.pigeon.image_picker_plus_ios.ImagePickerApi.pickVideo$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel =
         BasicMessageChannel<Object?>(
           pigeonVar_channelName,
@@ -347,7 +347,7 @@ class ImagePickerApi {
     int? limit,
   ) async {
     final String pigeonVar_channelName =
-        'dev.flutter.pigeon.image_picker_ios.ImagePickerApi.pickMultiVideo$pigeonVar_messageChannelSuffix';
+        'dev.flutter.pigeon.image_picker_plus_ios.ImagePickerApi.pickMultiVideo$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel =
         BasicMessageChannel<Object?>(
           pigeonVar_channelName,
@@ -382,7 +382,7 @@ class ImagePickerApi {
     MediaSelectionOptions mediaSelectionOptions,
   ) async {
     final String pigeonVar_channelName =
-        'dev.flutter.pigeon.image_picker_ios.ImagePickerApi.pickMedia$pigeonVar_messageChannelSuffix';
+        'dev.flutter.pigeon.image_picker_plus_ios.ImagePickerApi.pickMedia$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel =
         BasicMessageChannel<Object?>(
           pigeonVar_channelName,

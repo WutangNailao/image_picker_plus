@@ -248,7 +248,7 @@ void SetUpFLTImagePickerApiWithSuffix(id<FlutterBinaryMessenger> binaryMessenger
            initWithName:
                [NSString
                    stringWithFormat:@"%@%@",
-                                    @"dev.flutter.pigeon.image_picker_ios.ImagePickerApi.pickImage",
+                                    @"dev.flutter.pigeon.image_picker_plus_ios.ImagePickerApi.pickImage",
                                     messageChannelSuffix]
         binaryMessenger:binaryMessenger
                   codec:FLTGetMessagesCodec()];
@@ -279,7 +279,7 @@ void SetUpFLTImagePickerApiWithSuffix(id<FlutterBinaryMessenger> binaryMessenger
   {
     FlutterBasicMessageChannel *channel = [[FlutterBasicMessageChannel alloc]
            initWithName:[NSString stringWithFormat:@"%@%@",
-                                                   @"dev.flutter.pigeon.image_picker_ios."
+                                                   @"dev.flutter.pigeon.image_picker_plus_ios."
                                                    @"ImagePickerApi.pickMultiImage",
                                                    messageChannelSuffix]
         binaryMessenger:binaryMessenger
@@ -314,7 +314,7 @@ void SetUpFLTImagePickerApiWithSuffix(id<FlutterBinaryMessenger> binaryMessenger
            initWithName:
                [NSString
                    stringWithFormat:@"%@%@",
-                                    @"dev.flutter.pigeon.image_picker_ios.ImagePickerApi.pickVideo",
+                                    @"dev.flutter.pigeon.image_picker_plus_ios.ImagePickerApi.pickVideo",
                                     messageChannelSuffix]
         binaryMessenger:binaryMessenger
                   codec:FLTGetMessagesCodec()];
@@ -340,7 +340,7 @@ void SetUpFLTImagePickerApiWithSuffix(id<FlutterBinaryMessenger> binaryMessenger
   {
     FlutterBasicMessageChannel *channel = [[FlutterBasicMessageChannel alloc]
            initWithName:[NSString stringWithFormat:@"%@%@",
-                                                   @"dev.flutter.pigeon.image_picker_ios."
+                                                   @"dev.flutter.pigeon.image_picker_plus_ios."
                                                    @"ImagePickerApi.pickMultiVideo",
                                                    messageChannelSuffix]
         binaryMessenger:binaryMessenger
@@ -371,7 +371,7 @@ void SetUpFLTImagePickerApiWithSuffix(id<FlutterBinaryMessenger> binaryMessenger
            initWithName:
                [NSString
                    stringWithFormat:@"%@%@",
-                                    @"dev.flutter.pigeon.image_picker_ios.ImagePickerApi.pickMedia",
+                                    @"dev.flutter.pigeon.image_picker_plus_ios.ImagePickerApi.pickMedia",
                                     messageChannelSuffix]
         binaryMessenger:binaryMessenger
                   codec:FLTGetMessagesCodec()];

@@ -4,7 +4,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart' show visibleForTesting;
-import 'package:image_picker_platform_interface/image_picker_platform_interface.dart';
+import 'package:image_picker_plus_platform_interface/image_picker_plus_platform_interface.dart';
 
 import 'src/messages.g.dart';
 

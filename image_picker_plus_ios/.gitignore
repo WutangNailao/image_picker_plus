@@ -1,0 +1,7 @@
+
+# FVM Version Cache
+.fvm/
+**/.build/
+**/build/
+**/.symlinks/
+**/ios/Flutter/.last_build_id

@@ -1,4 +1,4 @@
-framework module image_picker_ios {
+framework module image_picker_plus_ios {
   umbrella header "image_picker_ios-umbrella.h"
 
   export *

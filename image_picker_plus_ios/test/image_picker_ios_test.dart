@@ -4,9 +4,9 @@
 
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:image_picker_ios/image_picker_ios.dart';
-import 'package:image_picker_ios/src/messages.g.dart';
-import 'package:image_picker_platform_interface/image_picker_platform_interface.dart';
+import 'package:image_picker_plus_ios/image_picker_ios.dart';
+import 'package:image_picker_plus_ios/src/messages.g.dart';
+import 'package:image_picker_plus_platform_interface/image_picker_plus_platform_interface.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
