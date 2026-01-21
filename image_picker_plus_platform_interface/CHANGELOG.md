@@ -1,3 +1,8 @@
+## 0.0.3
+
+* **BREAKING**: Renamed `XFileWithLocalIdentifier` to `XFileWithMetadata`.
+* Added `contentUri` field to `XFileWithMetadata` to expose Android content:// URIs.
+
 ## 0.0.2
 
 * Adds `XFileWithLocalIdentifier` to expose iOS Photos identifiers.
