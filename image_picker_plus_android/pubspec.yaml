@@ -21,7 +21,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_plugin_android_lifecycle: ^2.0.1
-  image_picker_plus_platform_interface: ^0.0.1
+  image_picker_plus_platform_interface: ^0.0.2
 
 dev_dependencies:
   flutter_test:
