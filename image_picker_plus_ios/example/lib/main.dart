@@ -543,7 +543,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   String _formatPickedLabel(XFile file) {
-    if (file is XFileWithLocalIdentifier && file.localIdentifier != null) {
+    if (file is XFileWithMetadata && file.localIdentifier != null) {
       return '${file.name} (${file.localIdentifier})';
     }
     return file.name;

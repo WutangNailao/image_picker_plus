@@ -2,7 +2,7 @@ name: image_picker_plus_ios
 description: iOS implementation of the image_picker_plus plugin.
 repository: https://github.com/WutangNailao/image_picker_plus
 issue_tracker: https://github.com/WutangNailao/image_picker_plus/issues
-version: 0.0.4
+version: 0.0.5
 
 environment:
   sdk: ^3.10.0
@@ -19,7 +19,7 @@ flutter:
 dependencies:
   flutter:
     sdk: flutter
-  image_picker_plus_platform_interface: ^0.0.2
+  image_picker_plus_platform_interface: ^0.0.3
 
 dev_dependencies:
   flutter_test:

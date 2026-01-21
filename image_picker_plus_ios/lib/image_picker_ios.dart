@@ -356,7 +356,7 @@ class ImagePickerIOS extends ImagePickerPlatform {
   }
 
   XFile _xFileFromResult(PickedMedia result) {
-    return XFileWithLocalIdentifier(
+    return XFileWithMetadata(
       result.path,
       name: result.path.split('/').last,
       localIdentifier: result.localIdentifier,

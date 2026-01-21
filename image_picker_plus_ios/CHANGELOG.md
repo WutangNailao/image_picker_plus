@@ -1,3 +1,8 @@
+## 0.0.5
+
+* Rename `XFileWithLocalIdentifier` to `XFileWithMetadata`.
+* Update `image_picker_plus_platform_interface` to ^0.0.3.
+
 ## 0.0.4
 
 * Include PHAsset `localIdentifier` in iOS picker results via Pigeon.
