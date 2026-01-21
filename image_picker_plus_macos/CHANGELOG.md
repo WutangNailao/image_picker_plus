@@ -1,33 +1,9 @@
+## 0.0.2
+
+* Update `image_picker_plus_platform_interface` to ^0.0.3.
+
 ## 0.0.1
 
 * Initial release of `image_picker_plus_macos`.
 * Forked from `image_picker_macos` v0.2.2+1.
 * Renamed package from `image_picker_macos` to `image_picker_plus_macos`.
-
-## 0.2.2+1
-
-* Updates minimum supported version to macOS 10.15.
-* Updates minimum supported SDK version to Flutter 3.35/Dart 3.9.
-
-## 0.2.2
-
-* Adds support for `getMultiVideoWithOptions`.
-* Updates minimum supported SDK version to Flutter 3.27/Dart 3.6.
-
-## 0.2.1+2
-
-* Updates README to reference alternate implementations.
-* Updates minimum supported SDK version to Flutter 3.22/Dart 3.4.
-
-## 0.2.1+1
-
-* Adds pub topics to package metadata.
-* Updates minimum supported SDK version to Flutter 3.7/Dart 2.19.
-
-## 0.2.1
-
-* Adds `getMedia` method.
-
-## 0.2.0
-
-* Implements initial macOS support.
