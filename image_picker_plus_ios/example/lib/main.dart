@@ -534,10 +534,19 @@ class _MyHomePageState extends State<MyHomePage> {
   void _showPickedSnackBar(BuildContext context, List<XFile> files) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Picked: ${files.map((XFile it) => it.name).join(',')}'),
+        content: Text(
+          'Picked: ${files.map(_formatPickedLabel).join(',')}',
+        ),
         duration: const Duration(seconds: 2),
       ),
     );
+  }
+
+  String _formatPickedLabel(XFile file) {
+    if (file is XFileWithLocalIdentifier && file.localIdentifier != null) {
+      return '${file.name} (${file.localIdentifier})';
+    }
+    return file.name;
   }
 }
 
