@@ -1,6 +1,6 @@
-# image\_picker\_for\_web
+# image\_picker\_plus\_for\_web
 
-A web implementation of [`image_picker`][1].
+A web implementation of [`image_picker_plus`][1].
 
 ## Limitations on the web platform
 
@@ -57,17 +57,16 @@ The argument `maxDuration` is not supported on the web.
 
 ### Import the package
 
-This package is [endorsed](https://flutter.dev/to/endorsed-federated-plugin),
-which means you can simply use `image_picker`
-normally. This package will be automatically included in your app when you do,
-so you do not need to add it to your `pubspec.yaml`.
+Most apps should depend on `image_picker_plus` rather than this package
+directly. This package is pulled in automatically when you use
+`image_picker_plus`.
 
 However, if you `import` this package to use any of its APIs directly, you
 should add it to your `pubspec.yaml` as usual.
 
 ### Use the plugin
 
-You should be able to use `package:image_picker` _almost_ as normal.
+You should be able to use `package:image_picker_plus` _almost_ as normal.
 
 Once the user has picked a file, the returned `XFile` instance will contain a
 `network`-accessible `Blob` URL (pointing to a location within the browser).
@@ -92,4 +91,4 @@ Or, using bytes:
 image = Image.memory(await pickedFile.readAsBytes());
 ```
 
-[1]: https://pub.dev/packages/image_picker
+[1]: https://pub.dev/packages/image_picker_plus

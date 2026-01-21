@@ -7,8 +7,8 @@ import 'dart:js_interop';
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:image_picker_for_web/image_picker_for_web.dart';
-import 'package:image_picker_platform_interface/image_picker_platform_interface.dart';
+import 'package:image_picker_plus_for_web/image_picker_plus_for_web.dart';
+import 'package:image_picker_plus_platform_interface/image_picker_plus_platform_interface.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:web/web.dart' as web;
 

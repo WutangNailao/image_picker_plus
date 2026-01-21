@@ -7,7 +7,7 @@ import 'dart:js_interop';
 
 import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
-import 'package:image_picker_platform_interface/image_picker_platform_interface.dart';
+import 'package:image_picker_plus_platform_interface/image_picker_plus_platform_interface.dart';
 import 'package:mime/mime.dart' as mime;
 import 'package:web/web.dart' as web;
 
@@ -20,7 +20,7 @@ const String _kAcceptVideoMimeType = 'video/3gpp,video/x-m4v,video/mp4,video/*';
 
 /// The web implementation of [ImagePickerPlatform].
 ///
-/// This class implements the `package:image_picker` functionality for the web.
+/// This class implements the `package:image_picker_plus` functionality for the web.
 class ImagePickerPlugin extends ImagePickerPlatform {
   /// A constructor that allows tests to override the function that creates file inputs.
   ImagePickerPlugin({
