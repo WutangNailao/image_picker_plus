@@ -10,7 +10,7 @@ dependencies:
     sdk: flutter
   image_picker_plus_for_web:
     path: ../
-  image_picker_plus_platform_interface: ^0.0.2
+  image_picker_plus_platform_interface: ^0.0.3
   web: ^1.0.0
 
 dev_dependencies:
