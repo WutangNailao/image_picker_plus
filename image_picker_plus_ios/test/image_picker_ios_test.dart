@@ -898,7 +898,7 @@ class _FakeImagePickerApi implements ImagePickerApi {
   int? passedMaxDurationSeconds;
 
   @override
-  Future<String?> pickImage(
+  Future<PickedMedia?> pickImage(
     SourceSpecification source,
     MaxSize maxSize,
     int? imageQuality,
@@ -909,11 +909,12 @@ class _FakeImagePickerApi implements ImagePickerApi {
     passedMaxSize = maxSize;
     passedImageQuality = imageQuality;
     passedRequestFullMetadata = requestFullMetadata;
-    return returnValue.firstOrNull;
+    final String? path = returnValue.firstOrNull;
+    return path != null ? PickedMedia(path: path) : null;
   }
 
   @override
-  Future<List<String>> pickMultiImage(
+  Future<List<PickedMedia>> pickMultiImage(
     MaxSize maxSize,
     int? imageQuality,
     bool requestFullMetadata,
@@ -924,38 +925,45 @@ class _FakeImagePickerApi implements ImagePickerApi {
     passedImageQuality = imageQuality;
     passedRequestFullMetadata = requestFullMetadata;
     passedLimit = limit;
-    return returnValue;
+    return returnValue
+        .map((String path) => PickedMedia(path: path))
+        .toList();
   }
 
   @override
-  Future<List<String>> pickMedia(
+  Future<List<PickedMedia>> pickMedia(
     MediaSelectionOptions mediaSelectionOptions,
   ) async {
     passedSelectionType = _SelectionType.media;
     passedMediaSelectionOptions = mediaSelectionOptions;
-    return returnValue;
+    return returnValue
+        .map((String path) => PickedMedia(path: path))
+        .toList();
   }
 
   @override
-  Future<String?> pickVideo(
+  Future<PickedMedia?> pickVideo(
     SourceSpecification source,
     int? maxDurationSeconds,
   ) async {
     passedSelectionType = _SelectionType.video;
     passedSource = source;
     passedMaxDurationSeconds = maxDurationSeconds;
-    return returnValue.firstOrNull;
+    final String? path = returnValue.firstOrNull;
+    return path != null ? PickedMedia(path: path) : null;
   }
 
   @override
-  Future<List<String>> pickMultiVideo(
+  Future<List<PickedMedia>> pickMultiVideo(
     int? maxDurationSeconds,
     int? limit,
   ) async {
     passedSelectionType = _SelectionType.multiVideo;
     passedMaxDurationSeconds = maxDurationSeconds;
     passedLimit = limit;
-    return returnValue;
+    return returnValue
+        .map((String path) => PickedMedia(path: path))
+        .toList();
   }
 
   @override

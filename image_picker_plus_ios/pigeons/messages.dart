@@ -39,6 +39,12 @@ class MediaSelectionOptions {
   int? limit;
 }
 
+class PickedMedia {
+  PickedMedia({required this.path, this.localIdentifier});
+  String path;
+  String? localIdentifier;
+}
+
 // Corresponds to `CameraDevice` from the platform interface package.
 enum SourceCamera { rear, front }
 
@@ -55,7 +61,7 @@ class SourceSpecification {
 abstract class ImagePickerApi {
   @async
   @ObjCSelector('pickImageWithSource:maxSize:quality:fullMetadata:')
-  String? pickImage(
+  PickedMedia? pickImage(
     SourceSpecification source,
     MaxSize maxSize,
     int? imageQuality,
@@ -63,7 +69,7 @@ abstract class ImagePickerApi {
   );
   @async
   @ObjCSelector('pickMultiImageWithMaxSize:quality:fullMetadata:limit:')
-  List<String> pickMultiImage(
+  List<PickedMedia> pickMultiImage(
     MaxSize maxSize,
     int? imageQuality,
     bool requestFullMetadata,
@@ -71,13 +77,13 @@ abstract class ImagePickerApi {
   );
   @async
   @ObjCSelector('pickVideoWithSource:maxDuration:')
-  String? pickVideo(SourceSpecification source, int? maxDurationSeconds);
+  PickedMedia? pickVideo(SourceSpecification source, int? maxDurationSeconds);
   @async
   @ObjCSelector('pickMultiVideoWithMaxDuration:limit:')
-  List<String> pickMultiVideo(int? maxDurationSeconds, int? limit);
+  List<PickedMedia> pickMultiVideo(int? maxDurationSeconds, int? limit);
 
   /// Selects images and videos and returns their paths.
   @async
   @ObjCSelector('pickMediaWithMediaSelectionOptions:')
-  List<String> pickMedia(MediaSelectionOptions mediaSelectionOptions);
+  List<PickedMedia> pickMedia(MediaSelectionOptions mediaSelectionOptions);
 }

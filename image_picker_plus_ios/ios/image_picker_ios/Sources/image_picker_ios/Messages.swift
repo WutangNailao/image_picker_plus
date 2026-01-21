@@ -119,6 +119,26 @@ public class FLTSourceSpecification {
     }
 }
 
+public class FLTPickedMedia {
+    public var path: String
+    public var localIdentifier: String?
+
+    public init(path: String, localIdentifier: String? = nil) {
+        self.path = path
+        self.localIdentifier = localIdentifier
+    }
+
+    static func fromList(_ list: [Any?]) -> FLTPickedMedia {
+        let path = list[0] as! String
+        let localIdentifier = list[1] as? String
+        return FLTPickedMedia(path: path, localIdentifier: localIdentifier)
+    }
+
+    func toList() -> [Any?] {
+        return [path, localIdentifier]
+    }
+}
+
 // MARK: - Codec
 
 private class MessagesPigeonCodecReader: FlutterStandardReader {
@@ -134,6 +154,8 @@ private class MessagesPigeonCodecReader: FlutterStandardReader {
             return FLTMediaSelectionOptions.fromList(readValue() as! [Any?])
         case 133:
             return FLTSourceSpecification.fromList(readValue() as! [Any?])
+        case 134:
+            return FLTPickedMedia.fromList(readValue() as! [Any?])
         default:
             return super.readValue(ofType: type)
         }
@@ -157,6 +179,9 @@ private class MessagesPigeonCodecWriter: FlutterStandardWriter {
         } else if let spec = value as? FLTSourceSpecification {
             writeByte(133)
             writeValue(spec.toList())
+        } else if let media = value as? FLTPickedMedia {
+            writeByte(134)
+            writeValue(media.toList())
         } else {
             super.writeValue(value)
         }
@@ -186,7 +211,7 @@ public protocol FLTImagePickerApi {
         maxSize: FLTMaxSize,
         quality imageQuality: NSNumber?,
         fullMetadata: Bool,
-        completion: @escaping (String?, FlutterError?) -> Void
+        completion: @escaping (FLTPickedMedia?, FlutterError?) -> Void
     )
 
     func pickMultiImage(
@@ -194,24 +219,24 @@ public protocol FLTImagePickerApi {
         quality imageQuality: NSNumber?,
         fullMetadata: Bool,
         limit: NSNumber?,
-        completion: @escaping ([String]?, FlutterError?) -> Void
+        completion: @escaping ([FLTPickedMedia]?, FlutterError?) -> Void
     )
 
     func pickVideo(
         withSource source: FLTSourceSpecification,
         maxDuration maxDurationSeconds: NSNumber?,
-        completion: @escaping (String?, FlutterError?) -> Void
+        completion: @escaping (FLTPickedMedia?, FlutterError?) -> Void
     )
 
     func pickMultiVideo(
         withMaxDuration maxDurationSeconds: NSNumber?,
         limit: NSNumber?,
-        completion: @escaping ([String]?, FlutterError?) -> Void
+        completion: @escaping ([FLTPickedMedia]?, FlutterError?) -> Void
     )
 
     func pickMedia(
         withMediaSelectionOptions options: FLTMediaSelectionOptions,
-        completion: @escaping ([String]?, FlutterError?) -> Void
+        completion: @escaping ([FLTPickedMedia]?, FlutterError?) -> Void
     )
 }
 

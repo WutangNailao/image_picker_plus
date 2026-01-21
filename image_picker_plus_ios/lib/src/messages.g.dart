@@ -178,6 +178,46 @@ class SourceSpecification {
   int get hashCode => Object.hashAll(_toList());
 }
 
+class PickedMedia {
+  PickedMedia({required this.path, this.localIdentifier});
+
+  String path;
+
+  String? localIdentifier;
+
+  List<Object?> _toList() {
+    return <Object?>[path, localIdentifier];
+  }
+
+  Object encode() {
+    return _toList();
+  }
+
+  static PickedMedia decode(Object result) {
+    result as List<Object?>;
+    return PickedMedia(
+      path: result[0]! as String,
+      localIdentifier: result[1] as String?,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! PickedMedia || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(encode(), other.encode());
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => Object.hashAll(_toList());
+}
+
 class _PigeonCodec extends StandardMessageCodec {
   const _PigeonCodec();
   @override
@@ -200,6 +240,9 @@ class _PigeonCodec extends StandardMessageCodec {
     } else if (value is SourceSpecification) {
       buffer.putUint8(133);
       writeValue(buffer, value.encode());
+    } else if (value is PickedMedia) {
+      buffer.putUint8(134);
+      writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
     }
@@ -220,6 +263,8 @@ class _PigeonCodec extends StandardMessageCodec {
         return MediaSelectionOptions.decode(readValue(buffer)!);
       case 133:
         return SourceSpecification.decode(readValue(buffer)!);
+      case 134:
+        return PickedMedia.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
     }
@@ -243,7 +288,7 @@ class ImagePickerApi {
 
   final String pigeonVar_messageChannelSuffix;
 
-  Future<String?> pickImage(
+  Future<PickedMedia?> pickImage(
     SourceSpecification source,
     MaxSize maxSize,
     int? imageQuality,
@@ -271,11 +316,11 @@ class ImagePickerApi {
         details: pigeonVar_replyList[2],
       );
     } else {
-      return (pigeonVar_replyList[0] as String?);
+      return (pigeonVar_replyList[0] as PickedMedia?);
     }
   }
 
-  Future<List<String>> pickMultiImage(
+  Future<List<PickedMedia>> pickMultiImage(
     MaxSize maxSize,
     int? imageQuality,
     bool requestFullMetadata,
@@ -308,11 +353,11 @@ class ImagePickerApi {
         message: 'Host platform returned null value for non-null return value.',
       );
     } else {
-      return (pigeonVar_replyList[0] as List<Object?>?)!.cast<String>();
+      return (pigeonVar_replyList[0] as List<Object?>?)!.cast<PickedMedia>();
     }
   }
 
-  Future<String?> pickVideo(
+  Future<PickedMedia?> pickVideo(
     SourceSpecification source,
     int? maxDurationSeconds,
   ) async {
@@ -338,11 +383,11 @@ class ImagePickerApi {
         details: pigeonVar_replyList[2],
       );
     } else {
-      return (pigeonVar_replyList[0] as String?);
+      return (pigeonVar_replyList[0] as PickedMedia?);
     }
   }
 
-  Future<List<String>> pickMultiVideo(
+  Future<List<PickedMedia>> pickMultiVideo(
     int? maxDurationSeconds,
     int? limit,
   ) async {
@@ -373,12 +418,12 @@ class ImagePickerApi {
         message: 'Host platform returned null value for non-null return value.',
       );
     } else {
-      return (pigeonVar_replyList[0] as List<Object?>?)!.cast<String>();
+      return (pigeonVar_replyList[0] as List<Object?>?)!.cast<PickedMedia>();
     }
   }
 
   /// Selects images and videos and returns their paths.
-  Future<List<String>> pickMedia(
+  Future<List<PickedMedia>> pickMedia(
     MediaSelectionOptions mediaSelectionOptions,
   ) async {
     final String pigeonVar_channelName =
@@ -408,7 +453,7 @@ class ImagePickerApi {
         message: 'Host platform returned null value for non-null return value.',
       );
     } else {
-      return (pigeonVar_replyList[0] as List<Object?>?)!.cast<String>();
+      return (pigeonVar_replyList[0] as List<Object?>?)!.cast<PickedMedia>();
     }
   }
 }

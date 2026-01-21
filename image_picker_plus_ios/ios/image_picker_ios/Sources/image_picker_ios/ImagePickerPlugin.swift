@@ -11,7 +11,7 @@ import UIKit
 
 // MARK: - FlutterResultAdapter
 
-public typealias FlutterResultAdapter = ([String]?, FlutterError?) -> Void
+public typealias FlutterResultAdapter = ([FLTPickedMedia]?, FlutterError?) -> Void
 
 // MARK: - ImagePickerMethodCallContext
 
@@ -161,7 +161,7 @@ public class ImagePickerPlugin: NSObject, FlutterPlugin, FLTImagePickerApi {
         maxSize: FLTMaxSize,
         quality imageQuality: NSNumber?,
         fullMetadata: Bool,
-        completion: @escaping (String?, FlutterError?) -> Void
+        completion: @escaping (FLTPickedMedia?, FlutterError?) -> Void
     ) {
         cancelInProgressCall()
 
@@ -190,7 +190,7 @@ public class ImagePickerPlugin: NSObject, FlutterPlugin, FLTImagePickerApi {
         quality imageQuality: NSNumber?,
         fullMetadata: Bool,
         limit: NSNumber?,
-        completion: @escaping ([String]?, FlutterError?) -> Void
+        completion: @escaping ([FLTPickedMedia]?, FlutterError?) -> Void
     ) {
         cancelInProgressCall()
 
@@ -206,7 +206,7 @@ public class ImagePickerPlugin: NSObject, FlutterPlugin, FLTImagePickerApi {
 
     public func pickMedia(
         withMediaSelectionOptions options: FLTMediaSelectionOptions,
-        completion: @escaping ([String]?, FlutterError?) -> Void
+        completion: @escaping ([FLTPickedMedia]?, FlutterError?) -> Void
     ) {
         cancelInProgressCall()
 
@@ -229,7 +229,7 @@ public class ImagePickerPlugin: NSObject, FlutterPlugin, FLTImagePickerApi {
     public func pickVideo(
         withSource source: FLTSourceSpecification,
         maxDuration maxDurationSeconds: NSNumber?,
-        completion: @escaping (String?, FlutterError?) -> Void
+        completion: @escaping (FLTPickedMedia?, FlutterError?) -> Void
     ) {
         cancelInProgressCall()
 
@@ -254,7 +254,7 @@ public class ImagePickerPlugin: NSObject, FlutterPlugin, FLTImagePickerApi {
     public func pickMultiVideo(
         withMaxDuration maxDurationSeconds: NSNumber?,
         limit: NSNumber?,
-        completion: @escaping ([String]?, FlutterError?) -> Void
+        completion: @escaping ([FLTPickedMedia]?, FlutterError?) -> Void
     ) {
         cancelInProgressCall()
 
@@ -387,10 +387,10 @@ public class ImagePickerPlugin: NSObject, FlutterPlugin, FLTImagePickerApi {
 
     // MARK: - Result Handling
 
-    private func sendCallResult(pathList: [String]?) {
+    private func sendCallResult(pathList: [FLTPickedMedia]?) {
         guard let context = callContext else { return }
 
-        if let list = pathList, list.contains(where: { $0.isEmpty }) {
+        if let list = pathList, list.contains(where: { $0.path.isEmpty }) {
             context.result(nil, FlutterError(code: "create_error", message: "pathList's items should not be null", details: nil))
         } else {
             context.result(pathList ?? [], nil)
@@ -406,7 +406,14 @@ public class ImagePickerPlugin: NSObject, FlutterPlugin, FLTImagePickerApi {
 
     // MARK: - Image Saving
 
-    private func saveImage(with originalImageData: NSData?, image: UIImage, maxWidth: NSNumber?, maxHeight: NSNumber?, imageQuality: NSNumber) {
+    private func saveImage(
+        with originalImageData: NSData?,
+        image: UIImage,
+        maxWidth: NSNumber?,
+        maxHeight: NSNumber?,
+        imageQuality: NSNumber,
+        localIdentifier: String?
+    ) {
         let savedPath = ImagePickerPhotoAssetUtil.saveImage(
             withOriginalImageData: originalImageData as Data?,
             image: image,
@@ -414,12 +421,25 @@ public class ImagePickerPlugin: NSObject, FlutterPlugin, FLTImagePickerApi {
             maxHeight: maxHeight,
             imageQuality: imageQuality
         )
-        sendCallResult(pathList: savedPath != nil ? [savedPath!] : nil)
+        sendCallResult(
+            pathList: savedPath != nil
+                ? [FLTPickedMedia(path: savedPath!, localIdentifier: localIdentifier)]
+                : nil
+        )
     }
 
-    private func saveImage(with pickerInfo: [String: Any]?, image: UIImage, imageQuality: NSNumber) {
+    private func saveImage(
+        with pickerInfo: [String: Any]?,
+        image: UIImage,
+        imageQuality: NSNumber,
+        localIdentifier: String?
+    ) {
         let savedPath = ImagePickerPhotoAssetUtil.saveImage(with: pickerInfo, image: image, imageQuality: imageQuality)
-        sendCallResult(pathList: savedPath != nil ? [savedPath!] : nil)
+        sendCallResult(
+            pathList: savedPath != nil
+                ? [FLTPickedMedia(path: savedPath!, localIdentifier: localIdentifier)]
+                : nil
+        )
     }
 }
 
@@ -454,16 +474,16 @@ extension ImagePickerPlugin: PHPickerViewControllerDelegate {
         let desiredImageQuality = getDesiredImageQuality(imageQuality)
         let requestFullMetadata = currentCallContext.requestFullMetadata
 
-        var pathList: [String?] = Array(repeating: nil, count: results.count)
+        var pathList: [FLTPickedMedia?] = Array(repeating: nil, count: results.count)
         var saveError: FlutterError?
 
         let sendListOperation = BlockOperation { [weak self] in
             if let error = saveError {
                 self?.sendCallResult(error: error)
             } else {
-                let validPaths = pathList.compactMap { $0 }
-                if validPaths.count == pathList.count {
-                    self?.sendCallResult(pathList: validPaths)
+                let validResults = pathList.compactMap { $0 }
+                if validResults.count == pathList.count {
+                    self?.sendCallResult(pathList: validResults)
                 } else {
                     self?.sendCallResult(error: FlutterError(code: "create_error", message: "Failed to save some images", details: nil))
                 }
@@ -479,7 +499,13 @@ extension ImagePickerPlugin: PHPickerViewControllerDelegate {
                 fullMetadata: requestFullMetadata
             ) { savedPath, error in
                 if let path = savedPath {
-                    pathList[index] = path
+                    let resolvedLocalIdentifier = resolveLocalIdentifier(
+                        from: result.assetIdentifier
+                    )
+                    pathList[index] = FLTPickedMedia(
+                        path: path,
+                        localIdentifier: resolvedLocalIdentifier
+                    )
                 } else {
                     saveError = error
                 }
@@ -497,13 +523,16 @@ extension ImagePickerPlugin: PHPickerViewControllerDelegate {
 extension ImagePickerPlugin: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     public func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
         let videoURL = info[.mediaURL] as? URL
+        let localIdentifier = (info[.phAsset] as? PHAsset)?.localIdentifier
         picker.dismiss(animated: true)
 
         guard callContext != nil else { return }
 
         if let videoURL = videoURL {
             if let destination = ImagePickerPhotoAssetUtil.saveVideo(from: videoURL) {
-                sendCallResult(pathList: [destination.path])
+                sendCallResult(
+                    pathList: [FLTPickedMedia(path: destination.path, localIdentifier: localIdentifier)]
+                )
             } else {
                 sendCallResult(error: FlutterError(code: "flutter_image_picker_copy_video_error", message: "Could not cache the video file.", details: nil))
             }
@@ -537,11 +566,23 @@ extension ImagePickerPlugin: UIImagePickerControllerDelegate, UINavigationContro
                 let infoDict = info.reduce(into: [String: Any]()) { result, pair in
                     result[pair.key.rawValue] = pair.value
                 }
-                saveImage(with: infoDict, image: scaledImage, imageQuality: desiredImageQuality)
+                saveImage(
+                    with: infoDict,
+                    image: scaledImage,
+                    imageQuality: desiredImageQuality,
+                    localIdentifier: localIdentifier
+                )
             } else {
                 let options = PHImageRequestOptions()
                 PHImageManager.default().requestImageDataAndOrientation(for: originalAsset!, options: options) { [weak self] imageData, _, _, _ in
-                    self?.saveImage(with: imageData as NSData?, image: scaledImage, maxWidth: maxWidth, maxHeight: maxHeight, imageQuality: desiredImageQuality)
+                    self?.saveImage(
+                        with: imageData as NSData?,
+                        image: scaledImage,
+                        maxWidth: maxWidth,
+                        maxHeight: maxHeight,
+                        imageQuality: desiredImageQuality,
+                        localIdentifier: originalAsset?.localIdentifier
+                    )
                 }
             }
         }
@@ -551,4 +592,10 @@ extension ImagePickerPlugin: UIImagePickerControllerDelegate, UINavigationContro
         picker.dismiss(animated: true)
         sendCallResult(pathList: nil)
     }
+}
+
+private func resolveLocalIdentifier(from assetIdentifier: String?) -> String? {
+    guard let assetIdentifier = assetIdentifier else { return nil }
+    let assets = PHAsset.fetchAssets(withLocalIdentifiers: [assetIdentifier], options: nil)
+    return assets.firstObject?.localIdentifier
 }

@@ -63,7 +63,7 @@ class ImagePickerIOS extends ImagePickerPlatform {
     int? imageQuality,
     CameraDevice preferredCameraDevice = CameraDevice.rear,
   }) async {
-    final String? path = await _pickImageAsPath(
+    final PickedMedia? result = await _pickImageAsPath(
       source: source,
       options: ImagePickerOptions(
         maxWidth: maxWidth,
@@ -72,7 +72,7 @@ class ImagePickerIOS extends ImagePickerPlatform {
         preferredCameraDevice: preferredCameraDevice,
       ),
     );
-    return path != null ? PickedFile(path) : null;
+    return result != null ? PickedFile(result.path) : null;
   }
 
   @override
@@ -80,11 +80,11 @@ class ImagePickerIOS extends ImagePickerPlatform {
     required ImageSource source,
     ImagePickerOptions options = const ImagePickerOptions(),
   }) async {
-    final String? path = await _pickImageAsPath(
+    final PickedMedia? result = await _pickImageAsPath(
       source: source,
       options: options,
     );
-    return path != null ? XFile(path) : null;
+    return result != null ? _xFileFromResult(result) : null;
   }
 
   @override
@@ -93,7 +93,7 @@ class ImagePickerIOS extends ImagePickerPlatform {
     double? maxHeight,
     int? imageQuality,
   }) async {
-    final List<String> paths = await _pickMultiImageAsPath(
+    final List<PickedMedia> results = await _pickMultiImageAsPath(
       options: MultiImagePickerOptions(
         imageOptions: ImageOptions(
           maxWidth: maxWidth,
@@ -104,22 +104,26 @@ class ImagePickerIOS extends ImagePickerPlatform {
     );
     // Convert an empty list to a null return since that was the legacy behavior
     // of this method.
-    if (paths.isEmpty) {
+    if (results.isEmpty) {
       return null;
     }
 
-    return paths.map((String path) => PickedFile(path)).toList();
+    return results
+        .map((PickedMedia result) => PickedFile(result.path))
+        .toList();
   }
 
   @override
   Future<List<XFile>> getMultiImageWithOptions({
     MultiImagePickerOptions options = const MultiImagePickerOptions(),
   }) async {
-    final List<String> paths = await _pickMultiImageAsPath(options: options);
-    return paths.map((String path) => XFile(path)).toList();
+    final List<PickedMedia> results = await _pickMultiImageAsPath(
+      options: options,
+    );
+    return results.map(_xFileFromResult).toList();
   }
 
-  Future<List<String>> _pickMultiImageAsPath({
+  Future<List<PickedMedia>> _pickMultiImageAsPath({
     MultiImagePickerOptions options = const MultiImagePickerOptions(),
   }) async {
     final int? imageQuality = options.imageOptions.imageQuality;
@@ -154,7 +158,7 @@ class ImagePickerIOS extends ImagePickerPlatform {
     );
   }
 
-  Future<String?> _pickImageAsPath({
+  Future<PickedMedia?> _pickImageAsPath({
     required ImageSource source,
     ImagePickerOptions options = const ImagePickerOptions(),
   }) {
@@ -193,9 +197,10 @@ class ImagePickerIOS extends ImagePickerPlatform {
     final MediaSelectionOptions mediaSelectionOptions =
         _mediaOptionsToMediaSelectionOptions(options);
 
-    return (await _hostApi.pickMedia(
+    final List<PickedMedia> results = await _hostApi.pickMedia(
       mediaSelectionOptions,
-    )).map((String? path) => XFile(path!)).toList();
+    );
+    return results.map(_xFileFromResult).toList();
   }
 
   MaxSize _imageOptionsToMaxSizeWithValidation(ImageOptions imageOptions) {
@@ -259,15 +264,15 @@ class ImagePickerIOS extends ImagePickerPlatform {
     CameraDevice preferredCameraDevice = CameraDevice.rear,
     Duration? maxDuration,
   }) async {
-    final String? path = await _pickVideoAsPath(
+    final PickedMedia? result = await _pickVideoAsPath(
       source: source,
       maxDuration: maxDuration,
       preferredCameraDevice: preferredCameraDevice,
     );
-    return path != null ? PickedFile(path) : null;
+    return result != null ? PickedFile(result.path) : null;
   }
 
-  Future<String?> _pickVideoAsPath({
+  Future<PickedMedia?> _pickVideoAsPath({
     required ImageSource source,
     CameraDevice preferredCameraDevice = CameraDevice.rear,
     Duration? maxDuration,
@@ -289,7 +294,7 @@ class ImagePickerIOS extends ImagePickerPlatform {
     int? imageQuality,
     CameraDevice preferredCameraDevice = CameraDevice.rear,
   }) async {
-    final String? path = await _pickImageAsPath(
+    final PickedMedia? result = await _pickImageAsPath(
       source: source,
       options: ImagePickerOptions(
         maxWidth: maxWidth,
@@ -298,7 +303,7 @@ class ImagePickerIOS extends ImagePickerPlatform {
         preferredCameraDevice: preferredCameraDevice,
       ),
     );
-    return path != null ? XFile(path) : null;
+    return result != null ? _xFileFromResult(result) : null;
   }
 
   @override
@@ -307,7 +312,7 @@ class ImagePickerIOS extends ImagePickerPlatform {
     double? maxHeight,
     int? imageQuality,
   }) async {
-    final List<String> paths = await _pickMultiImageAsPath(
+    final List<PickedMedia> results = await _pickMultiImageAsPath(
       options: MultiImagePickerOptions(
         imageOptions: ImageOptions(
           maxWidth: maxWidth,
@@ -318,11 +323,11 @@ class ImagePickerIOS extends ImagePickerPlatform {
     );
     // Convert an empty list to a null return since that was the legacy behavior
     // of this method.
-    if (paths.isEmpty) {
+    if (results.isEmpty) {
       return null;
     }
 
-    return paths.map((String path) => XFile(path)).toList();
+    return results.map(_xFileFromResult).toList();
   }
 
   @override
@@ -331,21 +336,30 @@ class ImagePickerIOS extends ImagePickerPlatform {
     CameraDevice preferredCameraDevice = CameraDevice.rear,
     Duration? maxDuration,
   }) async {
-    final String? path = await _pickVideoAsPath(
+    final PickedMedia? result = await _pickVideoAsPath(
       source: source,
       maxDuration: maxDuration,
       preferredCameraDevice: preferredCameraDevice,
     );
-    return path != null ? XFile(path) : null;
+    return result != null ? _xFileFromResult(result) : null;
   }
 
   @override
   Future<List<XFile>> getMultiVideoWithOptions({
     MultiVideoPickerOptions options = const MultiVideoPickerOptions(),
   }) async {
-    return (await _hostApi.pickMultiVideo(
+    final List<PickedMedia> results = await _hostApi.pickMultiVideo(
       options.maxDuration?.inSeconds,
       options.limit,
-    )).map((String path) => XFile(path)).toList();
+    );
+    return results.map(_xFileFromResult).toList();
+  }
+
+  XFile _xFileFromResult(PickedMedia result) {
+    return XFileWithLocalIdentifier(
+      result.path,
+      name: result.path.split('/').last,
+      localIdentifier: result.localIdentifier,
+    );
   }
 }
