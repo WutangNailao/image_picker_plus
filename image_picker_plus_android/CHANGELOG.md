@@ -1,3 +1,9 @@
+## 0.0.3
+
+* Return `PickedMedia` with `contentUri` from Android picker results via Pigeon.
+* Rename `XFileWithLocalIdentifier` to `XFileWithMetadata`.
+* Update `image_picker_plus_platform_interface` to ^0.0.3.
+
 ## 0.0.2
 
 * Fix the name error

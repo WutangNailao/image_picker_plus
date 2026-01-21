@@ -56,6 +56,20 @@ enum SourceCamera { rear, front }
 // Corresponds to `ImageSource` from the platform interface package.
 enum SourceType { camera, gallery }
 
+/// Represents a picked media file with its path and original content URI.
+class PickedMedia {
+  PickedMedia({required this.path, this.contentUri, this.mimeType});
+
+  /// The file system path to the picked media.
+  String path;
+
+  /// The original content:// URI from the Android system picker.
+  String? contentUri;
+
+  /// The MIME type of the media (e.g., "image/jpeg", "video/mp4").
+  String? mimeType;
+}
+
 /// Specification for the source of an image or video selection.
 class SourceSpecification {
   SourceSpecification(this.type, this.camera);
@@ -95,27 +109,27 @@ class CacheRetrievalResult {
 
 @HostApi()
 abstract class ImagePickerApi {
-  /// Selects images and returns their paths.
+  /// Selects images and returns their paths with content URIs.
   @TaskQueue(type: TaskQueueType.serialBackgroundThread)
   @async
-  List<String> pickImages(
+  List<PickedMedia> pickImages(
     SourceSpecification source,
     ImageSelectionOptions options,
     GeneralOptions generalOptions,
   );
 
-  /// Selects video and returns their paths.
+  /// Selects video and returns their paths with content URIs.
   @TaskQueue(type: TaskQueueType.serialBackgroundThread)
   @async
-  List<String> pickVideos(
+  List<PickedMedia> pickVideos(
     SourceSpecification source,
     VideoSelectionOptions options,
     GeneralOptions generalOptions,
   );
 
-  /// Selects images and videos and returns their paths.
+  /// Selects images and videos and returns their paths with content URIs.
   @async
-  List<String> pickMedia(
+  List<PickedMedia> pickMedia(
     MediaSelectionOptions mediaSelectionOptions,
     GeneralOptions generalOptions,
   );

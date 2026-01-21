@@ -24,6 +24,7 @@ import io.flutter.plugins.imagepicker.Messages.GeneralOptions;
 import io.flutter.plugins.imagepicker.Messages.ImagePickerApi;
 import io.flutter.plugins.imagepicker.Messages.ImageSelectionOptions;
 import io.flutter.plugins.imagepicker.Messages.MediaSelectionOptions;
+import io.flutter.plugins.imagepicker.Messages.PickedMedia;
 import io.flutter.plugins.imagepicker.Messages.Result;
 import io.flutter.plugins.imagepicker.Messages.SourceCamera;
 import io.flutter.plugins.imagepicker.Messages.SourceSpecification;
@@ -281,7 +282,7 @@ public class ImagePickerPlugin implements FlutterPlugin, ActivityAware, ImagePic
       @NonNull SourceSpecification source,
       @NonNull ImageSelectionOptions options,
       @NonNull GeneralOptions generalOptions,
-      @NonNull Result<List<String>> result) {
+      @NonNull Result<List<PickedMedia>> result) {
     ImagePickerDelegate delegate = getImagePickerDelegate();
     if (delegate == null) {
       result.error(
@@ -312,7 +313,7 @@ public class ImagePickerPlugin implements FlutterPlugin, ActivityAware, ImagePic
   public void pickMedia(
       @NonNull MediaSelectionOptions mediaSelectionOptions,
       @NonNull GeneralOptions generalOptions,
-      @NonNull Result<List<String>> result) {
+      @NonNull Result<List<PickedMedia>> result) {
     ImagePickerDelegate delegate = getImagePickerDelegate();
     if (delegate == null) {
       result.error(
@@ -328,7 +329,7 @@ public class ImagePickerPlugin implements FlutterPlugin, ActivityAware, ImagePic
       @NonNull SourceSpecification source,
       @NonNull VideoSelectionOptions options,
       @NonNull GeneralOptions generalOptions,
-      @NonNull Result<List<String>> result) {
+      @NonNull Result<List<PickedMedia>> result) {
     ImagePickerDelegate delegate = getImagePickerDelegate();
     if (delegate == null) {
       result.error(

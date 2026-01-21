@@ -96,12 +96,12 @@ public class ImagePickerDelegate
   private static class PendingCallState {
     public final @Nullable ImageSelectionOptions imageOptions;
     public final @Nullable VideoSelectionOptions videoOptions;
-    public final @NonNull Messages.Result<List<String>> result;
+    public final @NonNull Messages.Result<List<Messages.PickedMedia>> result;
 
     PendingCallState(
         @Nullable ImageSelectionOptions imageOptions,
         @Nullable VideoSelectionOptions videoOptions,
-        @NonNull Messages.Result<List<String>> result) {
+        @NonNull Messages.Result<List<Messages.PickedMedia>> result) {
       this.imageOptions = imageOptions;
       this.videoOptions = videoOptions;
       this.result = result;
@@ -198,7 +198,7 @@ public class ImagePickerDelegate
       final @NonNull ImageResizer imageResizer,
       final @Nullable ImageSelectionOptions pendingImageOptions,
       final @Nullable VideoSelectionOptions pendingVideoOptions,
-      final @Nullable Messages.Result<List<String>> result,
+      final @Nullable Messages.Result<List<Messages.PickedMedia>> result,
       final @NonNull ImagePickerCache cache,
       final PermissionManager permissionManager,
       final FileUriResolver fileUriResolver,
@@ -285,7 +285,7 @@ public class ImagePickerDelegate
   public void chooseMediaFromGallery(
       @NonNull Messages.MediaSelectionOptions options,
       @NonNull Messages.GeneralOptions generalOptions,
-      @NonNull Messages.Result<List<String>> result) {
+      @NonNull Messages.Result<List<Messages.PickedMedia>> result) {
     if (!setPendingOptionsAndResult(options.getImageSelectionOptions(), null, result)) {
       finishWithAlreadyActiveError(result);
       return;
@@ -331,7 +331,7 @@ public class ImagePickerDelegate
   public void chooseVideoFromGallery(
       @NonNull VideoSelectionOptions options,
       boolean usePhotoPicker,
-      @NonNull Messages.Result<List<String>> result) {
+      @NonNull Messages.Result<List<Messages.PickedMedia>> result) {
     if (!setPendingOptionsAndResult(null, options, result)) {
       finishWithAlreadyActiveError(result);
       return;
@@ -359,7 +359,7 @@ public class ImagePickerDelegate
   }
 
   public void takeVideoWithCamera(
-      @NonNull VideoSelectionOptions options, @NonNull Messages.Result<List<String>> result) {
+      @NonNull VideoSelectionOptions options, @NonNull Messages.Result<List<Messages.PickedMedia>> result) {
     if (!setPendingOptionsAndResult(null, options, result)) {
       finishWithAlreadyActiveError(result);
       return;
@@ -417,7 +417,7 @@ public class ImagePickerDelegate
   public void chooseImageFromGallery(
       @NonNull ImageSelectionOptions options,
       boolean usePhotoPicker,
-      @NonNull Messages.Result<List<String>> result) {
+      @NonNull Messages.Result<List<Messages.PickedMedia>> result) {
     if (!setPendingOptionsAndResult(options, null, result)) {
       finishWithAlreadyActiveError(result);
       return;
@@ -430,7 +430,7 @@ public class ImagePickerDelegate
       @NonNull ImageSelectionOptions options,
       boolean usePhotoPicker,
       int limit,
-      @NonNull Messages.Result<List<String>> result) {
+      @NonNull Messages.Result<List<Messages.PickedMedia>> result) {
     if (!setPendingOptionsAndResult(options, null, result)) {
       finishWithAlreadyActiveError(result);
       return;
@@ -479,7 +479,7 @@ public class ImagePickerDelegate
       @NonNull VideoSelectionOptions options,
       boolean usePhotoPicker,
       int limit,
-      @NonNull Messages.Result<List<String>> result) {
+      @NonNull Messages.Result<List<Messages.PickedMedia>> result) {
     if (!setPendingOptionsAndResult(null, options, result)) {
       finishWithAlreadyActiveError(result);
       return;
@@ -508,7 +508,7 @@ public class ImagePickerDelegate
   }
 
   public void takeImageWithCamera(
-      @NonNull ImageSelectionOptions options, @NonNull Messages.Result<List<String>> result) {
+      @NonNull ImageSelectionOptions options, @NonNull Messages.Result<List<Messages.PickedMedia>> result) {
     if (!setPendingOptionsAndResult(options, null, result)) {
       finishWithAlreadyActiveError(result);
       return;
@@ -703,14 +703,16 @@ public class ImagePickerDelegate
           return null;
         }
         String mimeType = includeMimeType ? activity.getContentResolver().getType(uri) : null;
-        paths.add(new MediaPath(path, mimeType));
+        // Preserve the original content:// URI
+        paths.add(new MediaPath(path, uri.toString(), mimeType));
       }
     } else {
       String path = fileUtils.getPathFromUri(activity, uri);
       if (path == null) {
         return null;
       }
-      paths.add(new MediaPath(path, null));
+      // Preserve the original content:// URI
+      paths.add(new MediaPath(path, uri.toString(), null));
     }
     return paths;
   }
@@ -751,16 +753,22 @@ public class ImagePickerDelegate
   }
 
   public class MediaPath {
-    public MediaPath(@NonNull String path, @Nullable String mimeType) {
+    public MediaPath(@NonNull String path, @Nullable String uri, @Nullable String mimeType) {
       this.path = path;
+      this.uri = uri;
       this.mimeType = mimeType;
     }
 
     final String path;
+    final String uri;
     final String mimeType;
 
     public @NonNull String getPath() {
       return path;
+    }
+
+    public @Nullable String getUri() {
+      return uri;
     }
 
     public @Nullable String getMimeType() {
@@ -812,7 +820,8 @@ public class ImagePickerDelegate
         return;
       }
 
-      finishWithSuccess(paths.get(0).path);
+      MediaPath mediaPath = paths.get(0);
+      finishWithSuccess(mediaPath.path, mediaPath.uri, mediaPath.mimeType);
       return;
     }
 
@@ -887,29 +896,38 @@ public class ImagePickerDelegate
       }
     }
 
-    ArrayList<String> finalPaths = new ArrayList<>();
+    ArrayList<Messages.PickedMedia> mediaList = new ArrayList<>();
     if (localImageOptions != null) {
       for (int i = 0; i < paths.size(); i++) {
-        MediaPath path = paths.get(i);
-        String finalPath = path.path;
-        if (path.mimeType == null || !path.mimeType.startsWith("video/")) {
-          finalPath = getResizedImagePath(path.path, localImageOptions);
+        MediaPath mediaPath = paths.get(i);
+        String finalPath = mediaPath.path;
+        if (mediaPath.mimeType == null || !mediaPath.mimeType.startsWith("video/")) {
+          finalPath = getResizedImagePath(mediaPath.path, localImageOptions);
         }
-        finalPaths.add(finalPath);
+        Messages.PickedMedia.Builder builder = new Messages.PickedMedia.Builder()
+            .setPath(finalPath)
+            .setContentUri(mediaPath.uri)
+            .setMimeType(mediaPath.mimeType);
+        mediaList.add(builder.build());
       }
-      finishWithListSuccess(finalPaths);
+      finishWithListSuccess(mediaList);
     } else {
       for (int i = 0; i < paths.size(); i++) {
-        finalPaths.add(paths.get(i).path);
+        MediaPath mediaPath = paths.get(i);
+        Messages.PickedMedia.Builder builder = new Messages.PickedMedia.Builder()
+            .setPath(mediaPath.path)
+            .setContentUri(mediaPath.uri)
+            .setMimeType(mediaPath.mimeType);
+        mediaList.add(builder.build());
       }
-      finishWithListSuccess(finalPaths);
+      finishWithListSuccess(mediaList);
     }
   }
 
   private boolean setPendingOptionsAndResult(
       @Nullable ImageSelectionOptions imageOptions,
       @Nullable VideoSelectionOptions videoOptions,
-      @NonNull Messages.Result<List<String>> result) {
+      @NonNull Messages.Result<List<Messages.PickedMedia>> result) {
     synchronized (pendingCallStateLock) {
       if (pendingCallState != null) {
         return false;
@@ -928,12 +946,23 @@ public class ImagePickerDelegate
   // A null imagePath indicates that the image picker was cancelled without
   // selection.
   private void finishWithSuccess(@Nullable String imagePath) {
+    finishWithSuccess(imagePath, null, null);
+  }
+
+  // Handles completion of selection with a single result including content URI.
+  private void finishWithSuccess(@Nullable String imagePath, @Nullable String contentUri, @Nullable String mimeType) {
+    ArrayList<Messages.PickedMedia> mediaList = new ArrayList<>();
     ArrayList<String> pathList = new ArrayList<>();
     if (imagePath != null) {
+      Messages.PickedMedia.Builder builder = new Messages.PickedMedia.Builder()
+          .setPath(imagePath)
+          .setContentUri(contentUri)
+          .setMimeType(mimeType);
+      mediaList.add(builder.build());
       pathList.add(imagePath);
     }
 
-    Messages.Result<List<String>> localResult = null;
+    Messages.Result<List<Messages.PickedMedia>> localResult = null;
     synchronized (pendingCallStateLock) {
       if (pendingCallState != null) {
         localResult = pendingCallState.result;
@@ -947,12 +976,17 @@ public class ImagePickerDelegate
         cache.saveResult(pathList, null, null);
       }
     } else {
-      localResult.success(pathList);
+      localResult.success(mediaList);
     }
   }
 
-  private void finishWithListSuccess(ArrayList<String> imagePaths) {
-    Messages.Result<List<String>> localResult = null;
+  private void finishWithListSuccess(ArrayList<Messages.PickedMedia> mediaList) {
+    Messages.Result<List<Messages.PickedMedia>> localResult = null;
+    ArrayList<String> pathList = new ArrayList<>();
+    for (Messages.PickedMedia media : mediaList) {
+      pathList.add(media.getPath());
+    }
+
     synchronized (pendingCallStateLock) {
       if (pendingCallState != null) {
         localResult = pendingCallState.result;
@@ -961,18 +995,18 @@ public class ImagePickerDelegate
     }
 
     if (localResult == null) {
-      cache.saveResult(imagePaths, null, null);
+      cache.saveResult(pathList, null, null);
     } else {
-      localResult.success(imagePaths);
+      localResult.success(mediaList);
     }
   }
 
-  private void finishWithAlreadyActiveError(Messages.Result<List<String>> result) {
+  private void finishWithAlreadyActiveError(Messages.Result<List<Messages.PickedMedia>> result) {
     result.error(new FlutterError("already_active", "Image picker is already active", null));
   }
 
   private void finishWithError(String errorCode, String errorMessage) {
-    Messages.Result<List<String>> localResult = null;
+    Messages.Result<List<Messages.PickedMedia>> localResult = null;
     synchronized (pendingCallStateLock) {
       if (pendingCallState != null) {
         localResult = pendingCallState.result;
