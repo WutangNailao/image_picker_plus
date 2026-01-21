@@ -4,7 +4,7 @@ repository: https://github.com/WutangNailao/image_picker_plus/image_picker_plus_
 issue_tracker: https://github.com/WutangNailao/image_picker_plus/issues
 # NOTE: We strongly prefer non-breaking changes, even at the expense of a
 # less-clean API. See https://flutter.dev/go/platform-interface-breaking-changes
-version: 0.0.1
+version: 0.0.2
 
 environment:
   sdk: ^3.8.0

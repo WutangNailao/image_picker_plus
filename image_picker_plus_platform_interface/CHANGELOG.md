@@ -1,3 +1,7 @@
+## 0.0.2
+
+* Adds `XFileWithLocalIdentifier` to expose iOS Photos identifiers.
+
 ## 0.0.1
 
 * Initial release of `image_picker_plus_platform_interface`.
