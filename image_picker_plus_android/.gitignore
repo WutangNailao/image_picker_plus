@@ -1,0 +1,5 @@
+
+# FVM Version Cache
+.fvm/
+
+local.properties

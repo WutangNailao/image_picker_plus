@@ -5,9 +5,9 @@
 import 'package:flutter/src/services/binary_messenger.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:image_picker_android/image_picker_android.dart';
-import 'package:image_picker_android/src/messages.g.dart';
-import 'package:image_picker_platform_interface/image_picker_platform_interface.dart';
+import 'package:image_picker_plus_android/image_picker_plus_android.dart';
+import 'package:image_picker_plus_android/src/messages.g.dart';
+import 'package:image_picker_plus_platform_interface/image_picker_plus_platform_interface.dart';
 
 void main() {
   late ImagePickerAndroid picker;
