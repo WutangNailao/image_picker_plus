@@ -11,7 +11,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_driver/driver_extension.dart';
 // #docregion photo-picker-example
-import 'package:image_picker_plus_android/image_picker_android.dart';
+import 'package:image_picker_plus_android/image_picker_plus_android.dart';
 import 'package:image_picker_plus_platform_interface/image_picker_plus_platform_interface.dart';
 // #enddocregion photo-picker-example
 import 'package:mime/mime.dart';
