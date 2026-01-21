@@ -5,11 +5,11 @@
 import 'package:file_selector_linux/file_selector_linux.dart';
 import 'package:file_selector_platform_interface/file_selector_platform_interface.dart';
 import 'package:flutter/foundation.dart';
-import 'package:image_picker_platform_interface/image_picker_platform_interface.dart';
+import 'package:image_picker_plus_platform_interface/image_picker_plus_platform_interface.dart';
 
 /// The Linux implementation of [ImagePickerPlatform].
 ///
-/// This class implements the `package:image_picker` functionality for
+/// This class implements the `package:image_picker_plus` functionality for
 /// Linux.
 class ImagePickerLinux extends CameraDelegatingImagePickerPlatform {
   /// Constructs a platform implementation.
