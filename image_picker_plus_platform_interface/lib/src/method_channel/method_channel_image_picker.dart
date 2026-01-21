@@ -7,7 +7,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
-import '../../image_picker_platform_interface.dart';
+import '../../image_picker_plus_platform_interface.dart';
 
 const MethodChannel _channel = MethodChannel('plugins.flutter.io/image_picker');
 
