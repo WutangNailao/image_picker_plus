@@ -1,3 +1,8 @@
+## 0.0.2
+
+* Fix the name error
+
+
 ## 0.0.1
 
 * Initial release of `image_picker_plus_android`.
