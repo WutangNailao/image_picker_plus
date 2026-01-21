@@ -1,3 +1,8 @@
+## 0.0.4
+
+* Include PHAsset `localIdentifier` in iOS picker results via Pigeon.
+* Update example code.
+
 ## 0.0.3
 
 * Rewrite iOS plugin from Objective-C to Swift.
