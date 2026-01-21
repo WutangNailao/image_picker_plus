@@ -1,3 +1,8 @@
+## 0.0.3
+
+* Rewrite iOS plugin from Objective-C to Swift.
+* Update minimum iOS deployment target to 14.0.
+
 ## 0.0.2
 
 * Fix umbrella header import path from `image_picker_ios` to `image_picker_plus_ios`.
