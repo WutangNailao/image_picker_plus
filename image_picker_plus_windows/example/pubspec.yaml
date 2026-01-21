@@ -10,7 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  image_picker_plus_platform_interface: ^0.0.2
+  image_picker_plus_platform_interface: ^0.0.3
   image_picker_plus_windows:
     # When depending on this package from a real application you should use:
     #   image_picker_plus_windows: ^x.y.z
