@@ -1,8 +1,15 @@
 .fvm/
 /**/.fvm/
+
 .dart_tool/
 /**/.dart_tool/
+
 .vscode/
 /**/.vscode/
+
 pubspec.lock
 /**/pubspec.lock
+/**/**/pubspec.lock
+
+/**/.flutter-plugins-dependencies
+/**/**/.flutter-plugins-dependencies
