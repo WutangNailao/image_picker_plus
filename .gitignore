@@ -1,0 +1,8 @@
+.fvm/
+/**/.fvm/
+.dart_tool/
+/**/.dart_tool/
+.vscode/
+/**/.vscode/
+pubspec.lock
+/**/pubspec.lock
