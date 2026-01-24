@@ -1,6 +1,6 @@
 name: image_picker_plus_ios
 description: iOS implementation of the image_picker_plus plugin.
-repository: https://github.com/WutangNailao/image_picker_plus
+repository: https://github.com/WutangNailao/image_picker_plus/tree/main/image_picker_plus_ios
 issue_tracker: https://github.com/WutangNailao/image_picker_plus/issues
 version: 0.0.5
 

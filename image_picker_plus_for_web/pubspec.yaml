@@ -1,6 +1,6 @@
 name: image_picker_plus_for_web
 description: Web platform implementation of image_picker_plus
-repository: https://github.com/WutangNailao/image_picker_plus
+repository: https://github.com/WutangNailao/image_picker_plus/tree/main/image_picker_plus_for_web
 issue_tracker: https://github.com/WutangNailao/image_picker_plus/issues
 version: 0.0.2
 

@@ -1,6 +1,6 @@
 name: image_picker_plus_platform_interface
 description: A common platform interface for the image_picker_plus plugin.
-repository: https://github.com/WutangNailao/image_picker_plus/image_picker_plus_platform_interface
+repository: https://github.com/WutangNailao/image_picker_plus/tree/main/image_picker_plus_platform_interface
 issue_tracker: https://github.com/WutangNailao/image_picker_plus/issues
 # NOTE: We strongly prefer non-breaking changes, even at the expense of a
 # less-clean API. See https://flutter.dev/go/platform-interface-breaking-changes
