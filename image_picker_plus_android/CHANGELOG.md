@@ -1,3 +1,9 @@
+## 0.0.4
+
+* Migrate Android implementation from Java to Kotlin.
+* Add Kotlin support to build configuration.
+* Remove unused `integration_test` dependency from example.
+
 ## 0.0.3
 
 * Return `PickedMedia` with `contentUri` from Android picker results via Pigeon.
