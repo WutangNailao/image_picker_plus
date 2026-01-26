@@ -2,30 +2,28 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-package io.flutter.plugins.imagepicker;
+package io.flutter.plugins.imagepicker
 
-import androidx.exifinterface.media.ExifInterface;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
+import androidx.exifinterface.media.ExifInterface
+import java.io.IOException
 
 class ExifDataCopier {
-  /**
-   * Copies all exif data not related to image structure and orientation tag. Data not related to
-   * image structure consists of category II (Shooting condition related metadata) and category III
-   * (Metadata storing other information) tags. Category I tags are not copied because they may be
-   * invalidated as a result of resizing. The exception is the orientation tag which is known to not
-   * be invalidated and is crucial for proper display of the image.
-   *
-   * <p>The categories mentioned refer to standard "CIPA DC-008-Translation-2012 Exchangeable image
-   * file format for digital still cameras: Exif Version 2.3"
-   * https://www.cipa.jp/std/documents/e/DC-008-2012_E.pdf. Version 2.3 has been chosen because
-   * {@code ExifInterface} is based on it.
-   */
-  void copyExif(ExifInterface oldExif, ExifInterface newExif) throws IOException {
-    @SuppressWarnings("deprecation")
-    List<String> attributes =
-        Arrays.asList(
+    /**
+     * Copies all exif data not related to image structure and orientation tag. Data not related to
+     * image structure consists of category II (Shooting condition related metadata) and category III
+     * (Metadata storing other information) tags. Category I tags are not copied because they may be
+     * invalidated as a result of resizing. The exception is the orientation tag which is known to not
+     * be invalidated and is crucial for proper display of the image.
+     *
+     * The categories mentioned refer to standard "CIPA DC-008-Translation-2012 Exchangeable image
+     * file format for digital still cameras: Exif Version 2.3"
+     * https://www.cipa.jp/std/documents/e/DC-008-2012_E.pdf. Version 2.3 has been chosen because
+     * [ExifInterface] is based on it.
+     */
+    @Throws(IOException::class)
+    fun copyExif(oldExif: ExifInterface, newExif: ExifInterface) {
+        @Suppress("DEPRECATION")
+        val attributes = listOf(
             ExifInterface.TAG_IMAGE_DESCRIPTION,
             ExifInterface.TAG_MAKE,
             ExifInterface.TAG_MODEL,
@@ -130,17 +128,19 @@ class ExifDataCopier {
             ExifInterface.TAG_GPS_DIFFERENTIAL,
             ExifInterface.TAG_GPS_H_POSITIONING_ERROR,
             ExifInterface.TAG_INTEROPERABILITY_INDEX,
-            ExifInterface.TAG_ORIENTATION);
-    for (String attribute : attributes) {
-      setIfNotNull(oldExif, newExif, attribute);
+            ExifInterface.TAG_ORIENTATION
+        )
+
+        attributes.forEach { attribute ->
+            setIfNotNull(oldExif, newExif, attribute)
+        }
+
+        newExif.saveAttributes()
     }
 
-    newExif.saveAttributes();
-  }
-
-  private static void setIfNotNull(ExifInterface oldExif, ExifInterface newExif, String property) {
-    if (oldExif.getAttribute(property) != null) {
-      newExif.setAttribute(property, oldExif.getAttribute(property));
+    private fun setIfNotNull(oldExif: ExifInterface, newExif: ExifInterface, property: String) {
+        oldExif.getAttribute(property)?.let { value ->
+            newExif.setAttribute(property, value)
+        }
     }
-  }
 }
