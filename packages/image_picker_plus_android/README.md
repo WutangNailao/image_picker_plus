@@ -1,5 +1,3 @@
-<?code-excerpt path-base="example/lib"?>
-
 # image\_picker\_plus\_android
 
 The Android implementation of [`image_picker_plus`][1].
@@ -15,7 +13,7 @@ should add it to your `pubspec.yaml` as usual.
 
 ## Photo Picker
 
-On Android 13 and above this packages uses the Android Photo Picker.
+On Android 13 and above this package uses the Android Photo Picker.
 
 On Android 12 and below this package has optional Android Photo Picker functionality.
 
@@ -34,6 +32,12 @@ import 'package:image_picker_plus_platform_interface/image_picker_plus_platform_
 ```
 
 In addition, `ImagePickerAndroid.useAndroidPhotoPicker` must be set to `true` to use the `limit` functionality. It is implemented based on [`ActivityResultContract`][3], so it can only be ensured to take effect on Android 13 or above. Otherwise, it depends on whether the corresponding system app supports it.
+
+## Example
+
+This federated package no longer includes a standalone `example/` app.
+Use the app in the root package (`image_picker_pluz/example`) for end-to-end
+usage examples.
 
 [1]: https://pub.dev/packages/image_picker_plus
 [2]: https://flutter.dev/to/endorsed-federated-plugin

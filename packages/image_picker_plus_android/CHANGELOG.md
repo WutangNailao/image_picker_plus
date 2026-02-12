@@ -1,3 +1,8 @@
+Unreleased
+
+* Remove legacy `example/` app files from this package.
+* Update README guidance to reflect current usage and example location.
+
 ## 0.0.4
 
 * Migrate Android implementation from Java to Kotlin.

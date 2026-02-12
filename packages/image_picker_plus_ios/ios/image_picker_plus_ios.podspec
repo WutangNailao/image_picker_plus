@@ -3,7 +3,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'image_picker_plus_ios'
-  s.version          = '0.0.1'
+  s.version          = '0.0.6'
   s.summary          = 'Flutter plugin that shows an image picker.'
   s.description      = <<-DESC
 A Flutter plugin for picking images from the image library, and taking new pictures with the camera.
