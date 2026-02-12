@@ -60,7 +60,9 @@ class ImagePickerAndroid extends ImagePickerPlatform {
       return null;
     }
 
-    return mediaList.map((PickedMedia media) => PickedFile(media.path)).toList();
+    return mediaList
+        .map((PickedMedia media) => PickedFile(media.path))
+        .toList();
   }
 
   Future<List<PickedMedia>> _getMultiImageMedia({
@@ -233,11 +235,13 @@ class ImagePickerAndroid extends ImagePickerPlatform {
     }
 
     return mediaList
-        .map((PickedMedia media) => XFileWithMetadata(
-              media.path,
-              contentUri: media.contentUri,
-              mimeType: media.mimeType,
-            ))
+        .map(
+          (PickedMedia media) => XFileWithMetadata(
+            media.path,
+            contentUri: media.contentUri,
+            mimeType: media.mimeType,
+          ),
+        )
         .toList();
   }
 
@@ -257,11 +261,13 @@ class ImagePickerAndroid extends ImagePickerPlatform {
     }
 
     return mediaList
-        .map((PickedMedia media) => XFileWithMetadata(
-              media.path,
-              contentUri: media.contentUri,
-              mimeType: media.mimeType,
-            ))
+        .map(
+          (PickedMedia media) => XFileWithMetadata(
+            media.path,
+            contentUri: media.contentUri,
+            mimeType: media.mimeType,
+          ),
+        )
         .toList();
   }
 
@@ -272,11 +278,13 @@ class ImagePickerAndroid extends ImagePickerPlatform {
       _mediaOptionsToGeneralOptions(options),
     );
     return mediaList
-        .map((PickedMedia media) => XFileWithMetadata(
-              media.path,
-              contentUri: media.contentUri,
-              mimeType: media.mimeType,
-            ))
+        .map(
+          (PickedMedia media) => XFileWithMetadata(
+            media.path,
+            contentUri: media.contentUri,
+            mimeType: media.mimeType,
+          ),
+        )
         .toList();
   }
 
@@ -319,11 +327,13 @@ class ImagePickerAndroid extends ImagePickerPlatform {
     }
 
     return mediaList
-        .map((PickedMedia media) => XFileWithMetadata(
-              media.path,
-              contentUri: media.contentUri,
-              mimeType: media.mimeType,
-            ))
+        .map(
+          (PickedMedia media) => XFileWithMetadata(
+            media.path,
+            contentUri: media.contentUri,
+            mimeType: media.mimeType,
+          ),
+        )
         .toList();
   }
 

@@ -925,9 +925,7 @@ class _FakeImagePickerApi implements ImagePickerApi {
     passedImageQuality = imageQuality;
     passedRequestFullMetadata = requestFullMetadata;
     passedLimit = limit;
-    return returnValue
-        .map((String path) => PickedMedia(path: path))
-        .toList();
+    return returnValue.map((String path) => PickedMedia(path: path)).toList();
   }
 
   @override
@@ -936,9 +934,7 @@ class _FakeImagePickerApi implements ImagePickerApi {
   ) async {
     passedSelectionType = _SelectionType.media;
     passedMediaSelectionOptions = mediaSelectionOptions;
-    return returnValue
-        .map((String path) => PickedMedia(path: path))
-        .toList();
+    return returnValue.map((String path) => PickedMedia(path: path)).toList();
   }
 
   @override
@@ -961,9 +957,7 @@ class _FakeImagePickerApi implements ImagePickerApi {
     passedSelectionType = _SelectionType.multiVideo;
     passedMaxDurationSeconds = maxDurationSeconds;
     passedLimit = limit;
-    return returnValue
-        .map((String path) => PickedMedia(path: path))
-        .toList();
+    return returnValue.map((String path) => PickedMedia(path: path)).toList();
   }
 
   @override
