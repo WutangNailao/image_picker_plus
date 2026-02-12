@@ -1,0 +1,19 @@
+name: image_picker_plus_workspace
+
+environment:
+  sdk: '>=3.6.0 <4.0.0'
+
+workspace:
+  - packages/image_picker_pluz
+  - packages/image_picker_plus_platform_interface
+  - packages/image_picker_plus_android
+  - packages/image_picker_plus_ios
+  - packages/image_picker_plus_windows
+  - packages/image_picker_plus_macos
+  - packages/image_picker_plus_linux
+  - packages/image_picker_plus_for_web
+
+dev_dependencies:
+  melos: ^7.4.0
+
+
