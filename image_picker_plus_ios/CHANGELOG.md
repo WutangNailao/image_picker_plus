@@ -1,3 +1,13 @@
+## 0.0.6
+
+* Fix iOS image quality nullability handling to preserve interface semantics.
+* Avoid false non-JPEG compression warnings when `imageQuality` is not provided.
+* Optimize PHPicker image processing with bounded concurrency and a fast file-copy path when no resize/compression is requested.
+* Reduce memory pressure during image and GIF processing.
+* Respect `requestFullMetadata` in the iOS save pipeline to avoid unnecessary metadata work.
+* Update package repository URL in `pubspec.yaml`.
+* Remove legacy iOS example app files under `example/ios`.
+
 ## 0.0.5
 
 * Rename `XFileWithLocalIdentifier` to `XFileWithMetadata`.
