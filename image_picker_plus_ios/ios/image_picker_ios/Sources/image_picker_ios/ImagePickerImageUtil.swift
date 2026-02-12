@@ -90,7 +90,7 @@ public class ImagePickerImageUtil {
 
     public static func scaledGIFImage(_ data: Data, maxWidth: NSNumber?, maxHeight: NSNumber?) -> GIFInfo? {
         let options: [CFString: Any] = [
-            kCGImageSourceShouldCache: true,
+            kCGImageSourceShouldCache: false,
             kCGImageSourceTypeIdentifierHint: kUTTypeGIF
         ]
 
@@ -100,28 +100,31 @@ public class ImagePickerImageUtil {
 
         let numberOfFrames = CGImageSourceGetCount(imageSource)
         var images: [UIImage] = []
+        images.reserveCapacity(numberOfFrames)
         var interval: TimeInterval = 0.0
 
         for index in 0..<numberOfFrames {
-            guard let cgImage = CGImageSourceCreateImageAtIndex(imageSource, index, options as CFDictionary) else {
-                continue
-            }
-
-            if let properties = CGImageSourceCopyPropertiesAtIndex(imageSource, index, nil) as? [CFString: Any],
-               let gifProperties = properties[kCGImagePropertyGIFDictionary] as? [CFString: Any] {
-                var delay = gifProperties[kCGImagePropertyGIFUnclampedDelayTime] as? Double
-                if delay == nil {
-                    delay = gifProperties[kCGImagePropertyGIFDelayTime] as? Double
+            autoreleasepool {
+                guard let cgImage = CGImageSourceCreateImageAtIndex(imageSource, index, options as CFDictionary) else {
+                    return
                 }
 
-                if interval == 0.0, let delay = delay {
-                    interval = delay
-                }
-            }
+                if let properties = CGImageSourceCopyPropertiesAtIndex(imageSource, index, nil) as? [CFString: Any],
+                   let gifProperties = properties[kCGImagePropertyGIFDictionary] as? [CFString: Any] {
+                    var delay = gifProperties[kCGImagePropertyGIFUnclampedDelayTime] as? Double
+                    if delay == nil {
+                        delay = gifProperties[kCGImagePropertyGIFDelayTime] as? Double
+                    }
 
-            var image = UIImage(cgImage: cgImage, scale: 1.0, orientation: .up)
-            image = scaledImage(image, maxWidth: maxWidth, maxHeight: maxHeight, isMetadataAvailable: true)
-            images.append(image)
+                    if interval == 0.0, let delay = delay {
+                        interval = delay
+                    }
+                }
+
+                var image = UIImage(cgImage: cgImage, scale: 1.0, orientation: .up)
+                image = scaledImage(image, maxWidth: maxWidth, maxHeight: maxHeight, isMetadataAvailable: true)
+                images.append(image)
+            }
         }
 
         return GIFInfo(images: images, interval: interval)

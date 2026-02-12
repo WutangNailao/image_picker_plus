@@ -32,12 +32,30 @@ public class ImagePickerPhotoAssetUtil {
         }
     }
 
+    public static func saveImageFile(from imageURL: URL) -> String? {
+        guard FileManager.default.isReadableFile(atPath: imageURL.path) else {
+            return nil
+        }
+
+        let fileName = imageURL.lastPathComponent
+        let destinationPath = temporaryFilePath(fileName)
+        let destination = URL(fileURLWithPath: destinationPath)
+
+        do {
+            try FileManager.default.copyItem(at: imageURL, to: destination)
+            return destination.path
+        } catch {
+            return nil
+        }
+    }
+
     public static func saveImage(
         withOriginalImageData originalImageData: Data?,
         image: UIImage,
         maxWidth: NSNumber?,
         maxHeight: NSNumber?,
-        imageQuality: NSNumber?
+        imageQuality: NSNumber?,
+        includeMetadata: Bool = true
     ) -> String? {
         var suffix = ImagePickerMetaDataUtil.defaultSuffix
         var type = ImagePickerMetaDataUtil.defaultMIMEType
@@ -46,7 +64,9 @@ public class ImagePickerPhotoAssetUtil {
         if let data = originalImageData {
             type = ImagePickerMetaDataUtil.getImageMIMEType(from: data)
             suffix = ImagePickerMetaDataUtil.imageTypeSuffix(from: type) ?? ImagePickerMetaDataUtil.defaultSuffix
-            metaData = ImagePickerMetaDataUtil.getMetaData(from: data)
+            if includeMetadata {
+                metaData = ImagePickerMetaDataUtil.getMetaData(from: data)
+            }
         }
 
         if type == .gif, let data = originalImageData {

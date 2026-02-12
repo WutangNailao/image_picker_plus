@@ -465,6 +465,7 @@ extension ImagePickerPlugin: PHPickerViewControllerDelegate {
         let saveQueue = OperationQueue()
         saveQueue.name = "Flutter Save Image Queue"
         saveQueue.qualityOfService = .userInitiated
+        saveQueue.maxConcurrentOperationCount = 10
 
         guard let currentCallContext = callContext else { return }
 
@@ -595,7 +596,5 @@ extension ImagePickerPlugin: UIImagePickerControllerDelegate, UINavigationContro
 }
 
 private func resolveLocalIdentifier(from assetIdentifier: String?) -> String? {
-    guard let assetIdentifier = assetIdentifier else { return nil }
-    let assets = PHAsset.fetchAssets(withLocalIdentifiers: [assetIdentifier], options: nil)
-    return assets.firstObject?.localIdentifier
+    return assetIdentifier
 }

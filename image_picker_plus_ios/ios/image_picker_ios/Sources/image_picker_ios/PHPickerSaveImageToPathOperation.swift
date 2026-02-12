@@ -72,19 +72,21 @@ public class PHPickerSaveImageToPathOperation: Operation {
         setExecuting(true)
 
         if pickerResult.itemProvider.hasItemConformingToTypeIdentifier(UTType.image.identifier) {
-            pickerResult.itemProvider.loadDataRepresentation(forTypeIdentifier: UTType.image.identifier) { [weak self] data, error in
-                guard let self = self else { return }
-                if let data = data {
-                    self.processImage(data)
-                } else {
-                    let flutterError = FlutterError(
-                        code: "invalid_image",
-                        message: error?.localizedDescription ?? "Unknown error",
-                        details: (error as NSError?)?.domain
-                    )
-                    self.completeOperation(with: nil, error: flutterError)
+            // Fast path: no resize/compression requested, so copying the picked file avoids
+            // decoding and re-encoding large images in memory.
+            if maxWidth == nil, maxHeight == nil, desiredImageQuality == nil {
+                pickerResult.itemProvider.loadFileRepresentation(forTypeIdentifier: UTType.image.identifier) { [weak self] imageURL, _ in
+                    guard let self = self else { return }
+                    if let imageURL = imageURL, let savedPath = ImagePickerPhotoAssetUtil.saveImageFile(from: imageURL) {
+                        self.completeOperation(with: savedPath, error: nil)
+                    } else {
+                        self.loadImageAsDataRepresentation()
+                    }
                 }
+                return
             }
+
+            loadImageAsDataRepresentation()
         } else if pickerResult.itemProvider.hasItemConformingToTypeIdentifier(UTType.movie.identifier) {
             processVideo()
         } else {
@@ -97,32 +99,51 @@ public class PHPickerSaveImageToPathOperation: Operation {
         }
     }
 
-    private func processImage(_ pickerImageData: Data) {
-        var localImage = UIImage(data: pickerImageData)
+    private func loadImageAsDataRepresentation() {
+        pickerResult.itemProvider.loadDataRepresentation(forTypeIdentifier: UTType.image.identifier) { [weak self] data, error in
+            guard let self = self else { return }
+            if let data = data {
+                self.processImage(data)
+            } else {
+                let flutterError = FlutterError(
+                    code: "invalid_image",
+                    message: error?.localizedDescription ?? "Unknown error",
+                    details: (error as NSError?)?.domain
+                )
+                self.completeOperation(with: nil, error: flutterError)
+            }
+        }
+    }
 
-        if let image = localImage, (maxWidth != nil || maxHeight != nil) {
-            localImage = ImagePickerImageUtil.scaledImage(
-                image,
+    private func processImage(_ pickerImageData: Data) {
+        autoreleasepool {
+            var localImage = UIImage(data: pickerImageData)
+
+            if let image = localImage, (maxWidth != nil || maxHeight != nil) {
+                localImage = ImagePickerImageUtil.scaledImage(
+                    image,
+                    maxWidth: maxWidth,
+                    maxHeight: maxHeight,
+                    isMetadataAvailable: true
+                )
+            }
+
+            guard let image = localImage else {
+                completeOperation(with: nil, error: FlutterError(code: "invalid_image", message: "Could not decode image", details: nil))
+                return
+            }
+
+            let savedPath = ImagePickerPhotoAssetUtil.saveImage(
+                withOriginalImageData: pickerImageData,
+                image: image,
                 maxWidth: maxWidth,
                 maxHeight: maxHeight,
-                isMetadataAvailable: true
+                imageQuality: desiredImageQuality,
+                includeMetadata: requestFullMetadata
             )
+
+            completeOperation(with: savedPath, error: nil)
         }
-
-        guard let image = localImage else {
-            completeOperation(with: nil, error: FlutterError(code: "invalid_image", message: "Could not decode image", details: nil))
-            return
-        }
-
-        let savedPath = ImagePickerPhotoAssetUtil.saveImage(
-            withOriginalImageData: pickerImageData,
-            image: image,
-            maxWidth: maxWidth,
-            maxHeight: maxHeight,
-            imageQuality: desiredImageQuality
-        )
-
-        completeOperation(with: savedPath, error: nil)
     }
 
     private func processVideo() {
