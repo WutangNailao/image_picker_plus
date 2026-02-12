@@ -15,7 +15,7 @@ public class PHPickerSaveImageToPathOperation: Operation {
     private let pickerResult: PHPickerResult
     private let maxHeight: NSNumber?
     private let maxWidth: NSNumber?
-    private let desiredImageQuality: NSNumber
+    private let desiredImageQuality: NSNumber?
     private let requestFullMetadata: Bool
     private let savedPathBlock: GetSavedPath
 
@@ -32,7 +32,7 @@ public class PHPickerSaveImageToPathOperation: Operation {
         result: PHPickerResult,
         maxHeight: NSNumber?,
         maxWidth: NSNumber?,
-        desiredImageQuality: NSNumber,
+        desiredImageQuality: NSNumber?,
         fullMetadata: Bool,
         savedPathBlock: @escaping GetSavedPath
     ) {

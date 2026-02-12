@@ -376,11 +376,11 @@ public class ImagePickerPlugin: NSObject, FlutterPlugin, FLTImagePickerApi {
         viewProvider.viewController?.present(imagePickerController, animated: true)
     }
 
-    private func getDesiredImageQuality(_ imageQuality: NSNumber?) -> NSNumber {
-        guard let quality = imageQuality else { return 1 }
+    private func getDesiredImageQuality(_ imageQuality: NSNumber?) -> NSNumber? {
+        guard let quality = imageQuality else { return nil }
         let intValue = quality.intValue
         if intValue < 0 || intValue > 100 {
-            return 1
+            return nil
         }
         return NSNumber(value: Float(intValue) / 100.0)
     }
@@ -411,7 +411,7 @@ public class ImagePickerPlugin: NSObject, FlutterPlugin, FLTImagePickerApi {
         image: UIImage,
         maxWidth: NSNumber?,
         maxHeight: NSNumber?,
-        imageQuality: NSNumber,
+        imageQuality: NSNumber?,
         localIdentifier: String?
     ) {
         let savedPath = ImagePickerPhotoAssetUtil.saveImage(
@@ -431,7 +431,7 @@ public class ImagePickerPlugin: NSObject, FlutterPlugin, FLTImagePickerApi {
     private func saveImage(
         with pickerInfo: [String: Any]?,
         image: UIImage,
-        imageQuality: NSNumber,
+        imageQuality: NSNumber?,
         localIdentifier: String?
     ) {
         let savedPath = ImagePickerPhotoAssetUtil.saveImage(with: pickerInfo, image: image, imageQuality: imageQuality)

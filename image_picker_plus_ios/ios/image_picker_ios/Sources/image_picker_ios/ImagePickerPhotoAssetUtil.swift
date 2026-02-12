@@ -37,7 +37,7 @@ public class ImagePickerPhotoAssetUtil {
         image: UIImage,
         maxWidth: NSNumber?,
         maxHeight: NSNumber?,
-        imageQuality: NSNumber
+        imageQuality: NSNumber?
     ) -> String? {
         var suffix = ImagePickerMetaDataUtil.defaultSuffix
         var type = ImagePickerMetaDataUtil.defaultMIMEType
@@ -62,7 +62,7 @@ public class ImagePickerPhotoAssetUtil {
     public static func saveImage(
         with info: [String: Any]?,
         image: UIImage,
-        imageQuality: NSNumber
+        imageQuality: NSNumber?
     ) -> String? {
         let metaData = info?[UIImagePickerController.InfoKey.mediaMetadata.rawValue] as? [String: Any]
         return saveImage(
@@ -88,7 +88,7 @@ public class ImagePickerPhotoAssetUtil {
         image: UIImage,
         suffix: String,
         type: ImagePickerMIMEType,
-        imageQuality: NSNumber
+        imageQuality: NSNumber?
     ) -> String? {
         var data = ImagePickerMetaDataUtil.convertImage(image, using: type, quality: imageQuality)
 
