@@ -11,14 +11,14 @@ import UIKit
 
 // MARK: - FlutterResultAdapter
 
-public typealias FlutterResultAdapter = ([FLTPickedMedia]?, FlutterError?) -> Void
+typealias FlutterResultAdapter = ([PickedMedia]?, Error?) -> Void
 
 // MARK: - ImagePickerMethodCallContext
 
 public class ImagePickerMethodCallContext {
     let result: FlutterResultAdapter
-    var maxSize: FLTMaxSize?
-    var imageQuality: NSNumber?
+    var maxSize: MaxSize?
+    var imageQuality: Int64?
     var maxItemCount: Int = 0
     var maxDuration: Double = 0
     var requestFullMetadata: Bool = false
@@ -46,15 +46,43 @@ public class DefaultViewProvider: NSObject, ViewProvider {
     }
 
     public var viewController: UIViewController? {
-        return registrar?.messenger() as? UIViewController
+        let activeSceneRootViewController = UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .first(where: { $0.activationState == .foregroundActive })?
+            .windows
+            .first(where: \.isKeyWindow)?
+            .rootViewController
+        let fallbackSceneRootViewController = UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap(\.windows)
+            .first(where: \.isKeyWindow)?
+            .rootViewController
+        let baseViewController =
+            registrar?.viewController
+            ?? activeSceneRootViewController
+            ?? fallbackSceneRootViewController
             ?? UIApplication.shared.delegate?.window??.rootViewController
+
+        return DefaultViewProvider.topViewController(from: baseViewController)
+    }
+
+    private static func topViewController(from viewController: UIViewController?) -> UIViewController? {
+        if let navigationController = viewController as? UINavigationController {
+            return topViewController(from: navigationController.visibleViewController)
+        }
+        if let tabBarController = viewController as? UITabBarController {
+            return topViewController(from: tabBarController.selectedViewController)
+        }
+        if let presentedViewController = viewController?.presentedViewController {
+            return topViewController(from: presentedViewController)
+        }
+        return viewController
     }
 }
 
 // MARK: - ImagePickerPlugin
 
-@objc(FLTImagePickerPlugin)
-public class ImagePickerPlugin: NSObject, FlutterPlugin, FLTImagePickerApi {
+public class ImagePickerPlugin: NSObject, FlutterPlugin, ImagePickerApi {
 
     private var imagePickerControllerOverrides: [UIImagePickerController]?
     private let viewProvider: ViewProvider
@@ -62,7 +90,7 @@ public class ImagePickerPlugin: NSObject, FlutterPlugin, FLTImagePickerApi {
 
     public static func register(with registrar: FlutterPluginRegistrar) {
         let instance = ImagePickerPlugin(viewProvider: DefaultViewProvider(registrar: registrar))
-        SetUpFLTImagePickerApi(registrar.messenger(), instance)
+        ImagePickerApiSetup.setUp(binaryMessenger: registrar.messenger(), api: instance)
     }
 
     init(viewProvider: ViewProvider) {
@@ -83,7 +111,7 @@ public class ImagePickerPlugin: NSObject, FlutterPlugin, FLTImagePickerApi {
         return UIImagePickerController()
     }
 
-    private func cameraDevice(for source: FLTSourceSpecification) -> UIImagePickerController.CameraDevice {
+    private func cameraDevice(for source: SourceSpecification) -> UIImagePickerController.CameraDevice {
         switch source.camera {
         case .front:
             return .front
@@ -95,6 +123,15 @@ public class ImagePickerPlugin: NSObject, FlutterPlugin, FLTImagePickerApi {
     }
 
     // MARK: - Launcher Methods
+
+    private func present(_ presentedViewController: UIViewController) -> Bool {
+        guard let hostViewController = viewProvider.viewController else {
+            return false
+        }
+
+        hostViewController.present(presentedViewController, animated: true)
+        return true
+    }
 
     private func launchPHPicker(with context: ImagePickerMethodCallContext) {
         let config = PHPickerConfiguration(photoLibrary: .shared())
@@ -116,10 +153,10 @@ public class ImagePickerPlugin: NSObject, FlutterPlugin, FLTImagePickerApi {
         pickerViewController.presentationController?.delegate = self
         self.callContext = context
 
-        showPhotoLibrary(with: pickerViewController)
+        _ = showPhotoLibrary(with: pickerViewController)
     }
 
-    private func launchUIImagePicker(with source: FLTSourceSpecification, context: ImagePickerMethodCallContext) {
+    private func launchUIImagePicker(with source: SourceSpecification, context: ImagePickerMethodCallContext) {
         let imagePickerController = createImagePickerController()
         imagePickerController.modalPresentationStyle = .currentContext
         imagePickerController.delegate = self
@@ -150,27 +187,31 @@ public class ImagePickerPlugin: NSObject, FlutterPlugin, FLTImagePickerApi {
                 showPhotoLibrary(with: imagePickerController)
             }
         @unknown default:
-            sendCallResult(error: FlutterError(code: "invalid_source", message: "Invalid image source.", details: nil))
+            sendCallResult(error: PigeonError(code: "invalid_source", message: "Invalid image source.", details: nil))
         }
     }
 
-    // MARK: - FLTImagePickerApi
+    // MARK: - ImagePickerApi
 
-    public func pickImage(
-        withSource source: FLTSourceSpecification,
-        maxSize: FLTMaxSize,
-        quality imageQuality: NSNumber?,
+    func pickImage(
+        withSource source: SourceSpecification,
+        maxSize: MaxSize,
+        quality imageQuality: Int64?,
         fullMetadata: Bool,
-        completion: @escaping (FLTPickedMedia?, FlutterError?) -> Void
+        completion: @escaping (Result<PickedMedia?, Error>) -> Void
     ) {
         cancelInProgressCall()
 
         let context = ImagePickerMethodCallContext { paths, error in
             if let paths = paths, paths.count > 1 {
-                completion(nil, FlutterError(code: "invalid_result", message: "Incorrect number of return paths provided", details: nil))
+                completion(.failure(PigeonError(code: "invalid_result", message: "Incorrect number of return paths provided", details: nil)))
                 return
             }
-            completion(paths?.first, error)
+            if let error = error {
+                completion(.failure(error))
+            } else {
+                completion(.success(paths?.first))
+            }
         }
         context.includeImages = true
         context.maxSize = maxSize
@@ -185,32 +226,44 @@ public class ImagePickerPlugin: NSObject, FlutterPlugin, FLTImagePickerApi {
         }
     }
 
-    public func pickMultiImage(
-        withMaxSize maxSize: FLTMaxSize,
-        quality imageQuality: NSNumber?,
+    func pickMultiImage(
+        withMaxSize maxSize: MaxSize,
+        quality imageQuality: Int64?,
         fullMetadata: Bool,
-        limit: NSNumber?,
-        completion: @escaping ([FLTPickedMedia]?, FlutterError?) -> Void
+        limit: Int64?,
+        completion: @escaping (Result<[PickedMedia], Error>) -> Void
     ) {
         cancelInProgressCall()
 
-        let context = ImagePickerMethodCallContext(result: completion)
+        let context = ImagePickerMethodCallContext { paths, error in
+            if let error = error {
+                completion(.failure(error))
+            } else {
+                completion(.success(paths ?? []))
+            }
+        }
         context.includeImages = true
         context.maxSize = maxSize
         context.imageQuality = imageQuality
         context.requestFullMetadata = fullMetadata
-        context.maxItemCount = limit?.intValue ?? 0
+        context.maxItemCount = limit.map(Int.init) ?? 0
 
         launchPHPicker(with: context)
     }
 
-    public func pickMedia(
-        withMediaSelectionOptions options: FLTMediaSelectionOptions,
-        completion: @escaping ([FLTPickedMedia]?, FlutterError?) -> Void
+    func pickMedia(
+        withMediaSelectionOptions options: MediaSelectionOptions,
+        completion: @escaping (Result<[PickedMedia], Error>) -> Void
     ) {
         cancelInProgressCall()
 
-        let context = ImagePickerMethodCallContext(result: completion)
+        let context = ImagePickerMethodCallContext { paths, error in
+            if let error = error {
+                completion(.failure(error))
+            } else {
+                completion(.success(paths ?? []))
+            }
+        }
         context.maxSize = options.maxSize
         context.imageQuality = options.imageQuality
         context.requestFullMetadata = options.requestFullMetadata
@@ -220,29 +273,33 @@ public class ImagePickerPlugin: NSObject, FlutterPlugin, FLTImagePickerApi {
         if !options.allowMultiple {
             context.maxItemCount = 1
         } else if let limit = options.limit {
-            context.maxItemCount = limit.intValue
+            context.maxItemCount = Int(limit)
         }
 
         launchPHPicker(with: context)
     }
 
-    public func pickVideo(
-        withSource source: FLTSourceSpecification,
-        maxDuration maxDurationSeconds: NSNumber?,
-        completion: @escaping (FLTPickedMedia?, FlutterError?) -> Void
+    func pickVideo(
+        withSource source: SourceSpecification,
+        maxDuration maxDurationSeconds: Int64?,
+        completion: @escaping (Result<PickedMedia?, Error>) -> Void
     ) {
         cancelInProgressCall()
 
         let context = ImagePickerMethodCallContext { paths, error in
             if let paths = paths, paths.count > 1 {
-                completion(nil, FlutterError(code: "invalid_result", message: "Incorrect number of return paths provided", details: nil))
+                completion(.failure(PigeonError(code: "invalid_result", message: "Incorrect number of return paths provided", details: nil)))
                 return
             }
-            completion(paths?.first, error)
+            if let error = error {
+                completion(.failure(error))
+            } else {
+                completion(.success(paths?.first))
+            }
         }
         context.includeVideo = true
         context.maxItemCount = 1
-        context.maxDuration = maxDurationSeconds?.doubleValue ?? 0
+        context.maxDuration = maxDurationSeconds.map(Double.init) ?? 0
 
         if source.type == .gallery {
             launchPHPicker(with: context)
@@ -251,17 +308,23 @@ public class ImagePickerPlugin: NSObject, FlutterPlugin, FLTImagePickerApi {
         }
     }
 
-    public func pickMultiVideo(
-        withMaxDuration maxDurationSeconds: NSNumber?,
-        limit: NSNumber?,
-        completion: @escaping ([FLTPickedMedia]?, FlutterError?) -> Void
+    func pickMultiVideo(
+        withMaxDuration maxDurationSeconds: Int64?,
+        limit: Int64?,
+        completion: @escaping (Result<[PickedMedia], Error>) -> Void
     ) {
         cancelInProgressCall()
 
-        let context = ImagePickerMethodCallContext(result: completion)
+        let context = ImagePickerMethodCallContext { paths, error in
+            if let error = error {
+                completion(.failure(error))
+            } else {
+                completion(.success(paths ?? []))
+            }
+        }
         context.includeVideo = true
-        context.maxItemCount = limit?.intValue ?? 0
-        context.maxDuration = maxDurationSeconds?.doubleValue ?? 0
+        context.maxItemCount = limit.map(Int.init) ?? 0
+        context.maxDuration = maxDurationSeconds.map(Double.init) ?? 0
 
         launchPHPicker(with: context)
     }
@@ -270,7 +333,7 @@ public class ImagePickerPlugin: NSObject, FlutterPlugin, FLTImagePickerApi {
 
     private func cancelInProgressCall() {
         if callContext != nil {
-            sendCallResult(error: FlutterError(code: "multiple_request", message: "Cancelled by a second request", details: nil))
+            sendCallResult(error: PigeonError(code: "multiple_request", message: "Cancelled by a second request", details: nil))
             callContext = nil
         }
     }
@@ -287,7 +350,7 @@ public class ImagePickerPlugin: NSObject, FlutterPlugin, FLTImagePickerApi {
             UIImagePickerController.isCameraDeviceAvailable(device) {
             imagePickerController.sourceType = .camera
             imagePickerController.cameraDevice = device
-            viewProvider.viewController?.present(imagePickerController, animated: true)
+            guard present(imagePickerController) else { return }
         } else {
             let alert = UIAlertController(
                 title: NSLocalizedString("Error", comment: "Alert title when camera unavailable"),
@@ -298,7 +361,7 @@ public class ImagePickerPlugin: NSObject, FlutterPlugin, FLTImagePickerApi {
                 title: NSLocalizedString("OK", comment: "Alert button when camera unavailable"),
                 style: .default
             ))
-            viewProvider.viewController?.present(alert, animated: true)
+            _ = present(alert)
             sendCallResult(pathList: nil)
         }
     }
@@ -352,33 +415,33 @@ public class ImagePickerPlugin: NSObject, FlutterPlugin, FLTImagePickerApi {
     private func errorNoCameraAccess(_ status: AVAuthorizationStatus) {
         switch status {
         case .restricted:
-            sendCallResult(error: FlutterError(code: "camera_access_restricted", message: "The user is not allowed to use the camera.", details: nil))
+            sendCallResult(error: PigeonError(code: "camera_access_restricted", message: "The user is not allowed to use the camera.", details: nil))
         default:
-            sendCallResult(error: FlutterError(code: "camera_access_denied", message: "The user did not allow camera access.", details: nil))
+            sendCallResult(error: PigeonError(code: "camera_access_denied", message: "The user did not allow camera access.", details: nil))
         }
     }
 
     private func errorNoPhotoAccess(_ status: PHAuthorizationStatus) {
         switch status {
         case .restricted:
-            sendCallResult(error: FlutterError(code: "photo_access_restricted", message: "The user is not allowed to use the photo.", details: nil))
+            sendCallResult(error: PigeonError(code: "photo_access_restricted", message: "The user is not allowed to use the photo.", details: nil))
         default:
-            sendCallResult(error: FlutterError(code: "photo_access_denied", message: "The user did not allow photo access.", details: nil))
+            sendCallResult(error: PigeonError(code: "photo_access_denied", message: "The user did not allow photo access.", details: nil))
         }
     }
 
-    private func showPhotoLibrary(with pickerViewController: PHPickerViewController) {
-        viewProvider.viewController?.present(pickerViewController, animated: true)
+    private func showPhotoLibrary(with pickerViewController: PHPickerViewController) -> Bool {
+        return present(pickerViewController)
     }
 
-    private func showPhotoLibrary(with imagePickerController: UIImagePickerController) {
+    private func showPhotoLibrary(with imagePickerController: UIImagePickerController) -> Bool {
         imagePickerController.sourceType = .photoLibrary
-        viewProvider.viewController?.present(imagePickerController, animated: true)
+        return present(imagePickerController)
     }
 
-    private func getDesiredImageQuality(_ imageQuality: NSNumber?) -> NSNumber? {
+    private func getDesiredImageQuality(_ imageQuality: Int64?) -> NSNumber? {
         guard let quality = imageQuality else { return nil }
-        let intValue = quality.intValue
+        let intValue = Int(quality)
         if intValue < 0 || intValue > 100 {
             return nil
         }
@@ -387,18 +450,18 @@ public class ImagePickerPlugin: NSObject, FlutterPlugin, FLTImagePickerApi {
 
     // MARK: - Result Handling
 
-    private func sendCallResult(pathList: [FLTPickedMedia]?) {
+    private func sendCallResult(pathList: [PickedMedia]?) {
         guard let context = callContext else { return }
 
         if let list = pathList, list.contains(where: { $0.path.isEmpty }) {
-            context.result(nil, FlutterError(code: "create_error", message: "pathList's items should not be null", details: nil))
+            context.result(nil, PigeonError(code: "create_error", message: "pathList's items should not be null", details: nil))
         } else {
             context.result(pathList ?? [], nil)
         }
         callContext = nil
     }
 
-    private func sendCallResult(error: FlutterError) {
+    private func sendCallResult(error: Error) {
         guard let context = callContext else { return }
         context.result(nil, error)
         callContext = nil
@@ -409,21 +472,21 @@ public class ImagePickerPlugin: NSObject, FlutterPlugin, FLTImagePickerApi {
     private func saveImage(
         with originalImageData: NSData?,
         image: UIImage,
-        maxWidth: NSNumber?,
-        maxHeight: NSNumber?,
+        maxWidth: Double?,
+        maxHeight: Double?,
         imageQuality: NSNumber?,
         localIdentifier: String?
     ) {
         let savedPath = ImagePickerPhotoAssetUtil.saveImage(
             withOriginalImageData: originalImageData as Data?,
             image: image,
-            maxWidth: maxWidth,
-            maxHeight: maxHeight,
+            maxWidth: maxWidth.map(NSNumber.init(value:)),
+            maxHeight: maxHeight.map(NSNumber.init(value:)),
             imageQuality: imageQuality
         )
         sendCallResult(
             pathList: savedPath != nil
-                ? [FLTPickedMedia(path: savedPath!, localIdentifier: localIdentifier)]
+                ? [PickedMedia(path: savedPath!, localIdentifier: localIdentifier)]
                 : nil
         )
     }
@@ -437,7 +500,7 @@ public class ImagePickerPlugin: NSObject, FlutterPlugin, FLTImagePickerApi {
         let savedPath = ImagePickerPhotoAssetUtil.saveImage(with: pickerInfo, image: image, imageQuality: imageQuality)
         sendCallResult(
             pathList: savedPath != nil
-                ? [FLTPickedMedia(path: savedPath!, localIdentifier: localIdentifier)]
+                ? [PickedMedia(path: savedPath!, localIdentifier: localIdentifier)]
                 : nil
         )
     }
@@ -475,8 +538,8 @@ extension ImagePickerPlugin: PHPickerViewControllerDelegate {
         let desiredImageQuality = getDesiredImageQuality(imageQuality)
         let requestFullMetadata = currentCallContext.requestFullMetadata
 
-        var pathList: [FLTPickedMedia?] = Array(repeating: nil, count: results.count)
-        var saveError: FlutterError?
+        var pathList: [PickedMedia?] = Array(repeating: nil, count: results.count)
+        var saveError: Error?
 
         let sendListOperation = BlockOperation { [weak self] in
             if let error = saveError {
@@ -486,7 +549,7 @@ extension ImagePickerPlugin: PHPickerViewControllerDelegate {
                 if validResults.count == pathList.count {
                     self?.sendCallResult(pathList: validResults)
                 } else {
-                    self?.sendCallResult(error: FlutterError(code: "create_error", message: "Failed to save some images", details: nil))
+                    self?.sendCallResult(error: PigeonError(code: "create_error", message: "Failed to save some images", details: nil))
                 }
             }
         }
@@ -494,8 +557,8 @@ extension ImagePickerPlugin: PHPickerViewControllerDelegate {
         for (index, result) in results.enumerated() {
             let saveOperation = PHPickerSaveImageToPathOperation(
                 result: result,
-                maxHeight: maxHeight,
-                maxWidth: maxWidth,
+                maxHeight: maxHeight.map(NSNumber.init(value:)),
+                maxWidth: maxWidth.map(NSNumber.init(value:)),
                 desiredImageQuality: desiredImageQuality,
                 fullMetadata: requestFullMetadata
             ) { savedPath, error in
@@ -503,12 +566,16 @@ extension ImagePickerPlugin: PHPickerViewControllerDelegate {
                     let resolvedLocalIdentifier = resolveLocalIdentifier(
                         from: result.assetIdentifier
                     )
-                    pathList[index] = FLTPickedMedia(
+                    pathList[index] = PickedMedia(
                         path: path,
                         localIdentifier: resolvedLocalIdentifier
                     )
-                } else {
-                    saveError = error
+                } else if let error = error {
+                    saveError = PigeonError(
+                        code: error.code,
+                        message: error.message,
+                        details: error.details
+                    )
                 }
             }
             sendListOperation.addDependency(saveOperation)
@@ -532,10 +599,10 @@ extension ImagePickerPlugin: UIImagePickerControllerDelegate, UINavigationContro
         if let videoURL = videoURL {
             if let destination = ImagePickerPhotoAssetUtil.saveVideo(from: videoURL) {
                 sendCallResult(
-                    pathList: [FLTPickedMedia(path: destination.path, localIdentifier: localIdentifier)]
+                    pathList: [PickedMedia(path: destination.path, localIdentifier: localIdentifier)]
                 )
             } else {
-                sendCallResult(error: FlutterError(code: "flutter_image_picker_copy_video_error", message: "Could not cache the video file.", details: nil))
+                sendCallResult(error: PigeonError(code: "flutter_image_picker_copy_video_error", message: "Could not cache the video file.", details: nil))
             }
         } else {
             var image = info[.editedImage] as? UIImage
@@ -555,7 +622,12 @@ extension ImagePickerPlugin: UIImagePickerControllerDelegate, UINavigationContro
 
             var scaledImage = finalImage
             if maxWidth != nil || maxHeight != nil {
-                scaledImage = ImagePickerImageUtil.scaledImage(finalImage, maxWidth: maxWidth, maxHeight: maxHeight, isMetadataAvailable: true)
+                scaledImage = ImagePickerImageUtil.scaledImage(
+                    finalImage,
+                    maxWidth: maxWidth.map(NSNumber.init(value:)),
+                    maxHeight: maxHeight.map(NSNumber.init(value:)),
+                    isMetadataAvailable: true
+                )
             }
 
             var originalAsset: PHAsset?

@@ -19,7 +19,7 @@ let package = Package(
     .target(
       name: "image_picker_plus_ios",
       dependencies: [],
-      path: "Sources/image_picker_ios",
+      path: "Sources",
       resources: [
         .process("Resources")
       ]

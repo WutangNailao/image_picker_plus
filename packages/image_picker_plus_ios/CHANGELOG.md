@@ -1,3 +1,10 @@
+## 0.0.7
+
+* Update iOS Pigeon definitions and generated code to use Swift output instead of Objective-C selectors.
+* Update the Swift plugin implementation to match the generated Swift Pigeon API.
+* Improve iOS view controller lookup for scene-based apps by preferring Flutter's registrar view controller and active window scenes.
+* Simplify the iOS source layout by flattening files under `ios/image_picker_ios/Sources`.
+
 ## 0.0.6
 
 * Fix iOS image quality nullability handling to preserve interface semantics.
