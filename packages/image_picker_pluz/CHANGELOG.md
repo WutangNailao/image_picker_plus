@@ -1,3 +1,8 @@
+## 0.0.4
+
+* Update `image_picker_plus_ios` to `^0.0.7`.
+* Pull in the latest iOS implementation updates, including Swift Pigeon bindings and scene-aware presenter lookup improvements.
+
 ## 0.0.3
 
 * Update platform implementations:

@@ -1,5 +1,6 @@
 name: image_picker_example
 description: Demonstrates how to use the image_picker plugin.
+version: 1.0.0+1
 
 environment:
   sdk: ^3.8.0
