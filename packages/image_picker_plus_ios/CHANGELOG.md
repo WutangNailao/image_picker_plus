@@ -1,3 +1,7 @@
+## 0.0.8
+
+* Correct the federated plugin declaration to implement `image_picker_pluz`.
+
 ## 0.0.7
 
 * Update iOS Pigeon definitions and generated code to use Swift output instead of Objective-C selectors.
