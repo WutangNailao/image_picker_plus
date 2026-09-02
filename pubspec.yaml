@@ -1,7 +1,8 @@
 name: image_picker_plus_workspace
+publish_to: none
 
 environment:
-  sdk: '>=3.6.0 <4.0.0'
+  sdk: '>=3.10.0 <4.0.0'
 
 workspace:
   - packages/image_picker_pluz
@@ -12,8 +13,16 @@ workspace:
   - packages/image_picker_plus_macos
   - packages/image_picker_plus_linux
   - packages/image_picker_plus_for_web
+  - packages/image_picker_pluz/example
 
 dev_dependencies:
   melos: ^7.4.0
 
-
+melos:
+  scripts:
+    analyze:
+      run: fvm dart run melos exec --concurrency=1 --fail-fast -- flutter analyze --no-pub
+      description: Analyze all workspace packages.
+    test:
+      run: fvm dart run melos exec --concurrency=1 --dir-exists=test --fail-fast -- flutter test --no-pub
+      description: Run tests in every package that has a test directory.

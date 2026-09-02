@@ -12,7 +12,7 @@ resolution: workspace
 
 flutter:
   plugin:
-    implements: image_picker_plus
+    implements: image_picker_pluz
     platforms:
       windows:
         dartPluginClass: ImagePickerWindows

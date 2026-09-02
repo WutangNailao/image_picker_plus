@@ -26,6 +26,7 @@ keystore.properties
 .uuid
 
 pubspec.lock
+!/pubspec.lock
 
 # iOS and macOS dependencies
 .build/
