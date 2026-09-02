@@ -1001,7 +1001,7 @@ class _FakeImagePickerApi implements ImagePickerApi {
   _LastPickType? lastCall;
 
   @override
-  Future<List<String>> pickImages(
+  Future<List<PickedMedia>> pickImages(
     SourceSpecification source,
     ImageSelectionOptions options,
     GeneralOptions generalOptions,
@@ -1012,11 +1012,11 @@ class _FakeImagePickerApi implements ImagePickerApi {
     passedAllowMultiple = generalOptions.allowMultiple;
     passedPhotoPickerFlag = generalOptions.usePhotoPicker;
     limit = generalOptions.limit;
-    return returnValue as List<String>? ?? <String>[];
+    return _pickedMediaReturnValue();
   }
 
   @override
-  Future<List<String>> pickMedia(
+  Future<List<PickedMedia>> pickMedia(
     MediaSelectionOptions options,
     GeneralOptions generalOptions,
   ) async {
@@ -1025,11 +1025,11 @@ class _FakeImagePickerApi implements ImagePickerApi {
     passedPhotoPickerFlag = generalOptions.usePhotoPicker;
     passedAllowMultiple = generalOptions.allowMultiple;
     limit = generalOptions.limit;
-    return returnValue as List<String>? ?? <String>[];
+    return _pickedMediaReturnValue();
   }
 
   @override
-  Future<List<String>> pickVideos(
+  Future<List<PickedMedia>> pickVideos(
     SourceSpecification source,
     VideoSelectionOptions options,
     GeneralOptions generalOptions,
@@ -1040,12 +1040,25 @@ class _FakeImagePickerApi implements ImagePickerApi {
     passedAllowMultiple = generalOptions.allowMultiple;
     passedPhotoPickerFlag = generalOptions.usePhotoPicker;
     limit = generalOptions.limit;
-    return returnValue as List<String>? ?? <String>[];
+    return _pickedMediaReturnValue();
   }
 
   @override
   Future<CacheRetrievalResult?> retrieveLostResults() async {
     return returnValue as CacheRetrievalResult?;
+  }
+
+  List<PickedMedia> _pickedMediaReturnValue() {
+    final Object? value = returnValue;
+    if (value == null) {
+      return <PickedMedia>[];
+    }
+    if (value is List<PickedMedia>) {
+      return value;
+    }
+    return (value as List<String>)
+        .map((String path) => PickedMedia(path: path))
+        .toList();
   }
 
   @override
