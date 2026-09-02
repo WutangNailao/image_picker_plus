@@ -1,5 +1,9 @@
-Unreleased
+## 0.0.5
 
+* Migrate Android builds to AGP 9 and Android built-in Kotlin.
+* Migrate Android native unit tests from Java to Kotlin.
+* Correct the federated plugin declaration to implement `image_picker_pluz`.
+* Raise the minimum supported Dart SDK to 3.12 and Flutter SDK to 3.44.
 * Remove legacy `example/` app files from this package.
 * Update README guidance to reflect current usage and example location.
 

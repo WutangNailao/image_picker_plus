@@ -1,12 +1,12 @@
 name: image_picker_plus_android
-description: Android implementation of the image_picker_plus plugin.
-repository: https://github.com/WutangNailao/image_picker_plus/tree/main/image_picker_plus_android
+description: Android implementation of the image_picker_pluz plugin.
+repository: https://github.com/WutangNailao/image_picker_plus/tree/main/packages/image_picker_plus_android
 issue_tracker: https://github.com/WutangNailao/image_picker_plus/issues
-version: 0.0.4
+version: 0.0.5
 
 environment:
-  sdk: ^3.9.0
-  flutter: ">=3.35.0"
+  sdk: ^3.12.0
+  flutter: ">=3.44.0"
   
 resolution: workspace
 

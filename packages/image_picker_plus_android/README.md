@@ -1,15 +1,20 @@
 # image\_picker\_plus\_android
 
-The Android implementation of [`image_picker_plus`][1].
+The Android implementation of [`image_picker_pluz`][1].
 
 ## Usage
 
-This package is [endorsed][2], which means you can simply use `image_picker_plus`
+This package is [endorsed][2], which means you can simply use `image_picker_pluz`
 normally. This package will be automatically included in your app when you do,
 so you do not need to add it to your `pubspec.yaml`.
 
 However, if you `import` this package to use any of its APIs directly, you
 should add it to your `pubspec.yaml` as usual.
+
+## Requirements
+
+Version 0.0.5 and later use Android built-in Kotlin with AGP 9 and require
+Dart 3.12 or later and Flutter 3.44 or later.
 
 ## Photo Picker
 
@@ -17,7 +22,7 @@ On Android 13 and above this package uses the Android Photo Picker.
 
 On Android 12 and below this package has optional Android Photo Picker functionality.
 
-To use this feature, add the following code to your app before calling any `image_picker_plus` APIs:
+To use this feature, add the following code to your app before calling any `image_picker_pluz` APIs:
 
 <?code-excerpt "main.dart (photo-picker-example)"?>
 ```dart
@@ -39,6 +44,6 @@ This federated package no longer includes a standalone `example/` app.
 Use the app in the root package (`image_picker_pluz/example`) for end-to-end
 usage examples.
 
-[1]: https://pub.dev/packages/image_picker_plus
+[1]: https://pub.dev/packages/image_picker_pluz
 [2]: https://flutter.dev/to/endorsed-federated-plugin
 [3]: https://developer.android.google.cn/reference/kotlin/androidx/activity/result/contract/ActivityResultContracts.PickMultipleVisualMedia

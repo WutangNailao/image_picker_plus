@@ -1,3 +1,10 @@
+## Unversioned
+
+* Update `image_picker_plus_android` to `^0.0.5`.
+* Migrate Android builds to AGP 9 and Android built-in Kotlin.
+* Update `image_picker_plus_ios` to `^0.0.8`.
+* Correct the iOS federated plugin declaration to implement `image_picker_pluz`.
+
 ## 0.0.4
 
 * Update `image_picker_plus_ios` to `^0.0.7`.
