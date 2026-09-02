@@ -1,6 +1,12 @@
+## 0.0.9
+
+* Rename the Swift package directory to `ios/image_picker_plus_ios` so Flutter can detect Swift Package Manager support.
+* Include the federated plugin declaration correction from the retracted 0.0.8 release.
+
 ## 0.0.8
 
 * Correct the federated plugin declaration to implement `image_picker_pluz`.
+* Retracted because the Swift package directory did not match the plugin name.
 
 ## 0.0.7
 
