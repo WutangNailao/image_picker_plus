@@ -16,7 +16,7 @@ workspace:
   - packages/image_picker_pluz/example
 
 dev_dependencies:
-  melos: ^7.4.0
+  melos: ^8.6.0
 
 melos:
   scripts:
