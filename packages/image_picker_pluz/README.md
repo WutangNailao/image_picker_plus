@@ -1,24 +1,25 @@
-# Image Picker plugin for Flutter
+# image_picker_pluz
 <?code-excerpt path-base="example/lib"?>
 
-[![pub package](https://img.shields.io/pub/v/image_picker.svg)](https://pub.dev/packages/image_picker)
+[![pub package](https://img.shields.io/pub/v/image_picker_pluz.svg)](https://pub.dev/packages/image_picker_pluz)
 
-A Flutter plugin for picking images from the image library, and taking new pictures with the camera.
+A Flutter plugin for selecting images and videos from the device library and
+capturing photos and videos with the camera.
 
 |             | Android | iOS     | Linux | macOS  | Web                             | Windows     |
 |-------------|---------|---------|-------|--------|---------------------------------|-------------|
-| **Support** | SDK 24+ | iOS 13+ | Any   | 10.15+ | [See `image_picker_for_web`](https://pub.dev/packages/image_picker_for_web#limitations-on-the-web-platform) | Windows 10+ |
+| **Support** | SDK 24+ | iOS 14+ | Any   | 10.15+ | [See `image_picker_plus_for_web`](https://pub.dev/packages/image_picker_plus_for_web#limitations-on-the-web-platform) | Windows 10+ |
 
 ## Setup
 
 ### iOS
 
-Starting with version **0.8.1** the iOS implementation uses PHPicker to pick
-(multiple) images on iOS 14 or higher.
+The upstream `image_picker` iOS implementation has used PHPicker since version
+**0.8.1** to pick multiple images on iOS 14 or higher.
 As a result of implementing PHPicker it becomes impossible to pick HEIC images
 on the iOS simulator in iOS 14+. This is a known issue. Please test this on a
 real device, or test with non-HEIC images until Apple solves this issue.
-[63426347 - Apple known issue](https://www.google.com/search?q=63426347+apple&sxsrf=ALeKk01YnTMid5S0PYvhL8GbgXJ40ZS[…]t=gws-wiz&ved=0ahUKEwjKh8XH_5HwAhWL_rsIHUmHDN8Q4dUDCA8&uact=5)
+This is tracked as Apple issue 63426347.
 
 Add the following keys to your _Info.plist_ file, located in
 `<project root>/ios/Runner/Info.plist`:
@@ -37,19 +38,20 @@ _Privacy - Microphone Usage Description_ in the visual editor.
 
 ### Android
 
-No configuration required - the plugin should work out of the box. It is however
-highly recommended to prepare for Android killing the application when low on memory. How to prepare for this is discussed in the
+No configuration required - the plugin should work out of the box. It is
+however highly recommended to prepare for Android killing the application when
+low on memory. How to prepare for this is discussed in the
 [Handling MainActivity destruction on Android](#handling-mainactivity-destruction-on-android)
 section.
 
 It is no longer required to add `android:requestLegacyExternalStorage="true"` as
 an attribute to the `<application>` tag in AndroidManifest.xml, as
-`image_picker` has been updated to make use of scoped storage.
+`image_picker_pluz` uses scoped storage.
 
 #### Handling MainActivity destruction
 
 When under high memory pressure the Android system may kill the MainActivity of
-the application using the image_picker. On Android the image_picker makes use
+the application using `image_picker_pluz`. On Android the plugin makes use
 of the default `Intent.ACTION_GET_CONTENT` or `MediaStore.ACTION_IMAGE_CAPTURE`
 intents. This means that while the intent is executing the source application
 is moved to the background and becomes eligible for cleanup when the system is
@@ -76,8 +78,8 @@ Future<void> getLostData() async {
 
 This check should always be run at startup in order to detect and handle this
 case. Please refer to the
-[example app](https://pub.dev/packages/image_picker/example) for a more complete
-example of handling this flow.
+[example app](https://pub.dev/packages/image_picker_pluz/example) for a more
+complete example of handling this flow.
 
 #### Permanently storing images and videos
 
@@ -91,7 +93,7 @@ responsibility to move it to a more permanent location.
 On Android 13 and above this package uses the
 [Android Photo Picker](https://developer.android.com/training/data-storage/shared/photopicker)
 . On Android 12 and below use of Android Photo Picker is optional. 
-[Learn how to use it](https://pub.dev/packages/image_picker_android).
+[Learn how to use it](https://pub.dev/packages/image_picker_plus_android).
 
 #### Using `launchMode: singleInstance`
 
@@ -112,11 +114,11 @@ such as max width and height, are not yet supported.
 By default, `ImageSource.camera` is not supported, since unlike on Android and
 iOS there is no system-provided UI for taking photos. However, the desktop
 implementations allow delegating to a camera handler by setting a
-`cameraDelegate` before using `image_picker`, such as in `main()`:
+`cameraDelegate` before using `image_picker_pluz`, such as in `main()`:
 
 <?code-excerpt "readme_excerpts.dart (CameraDelegate)"?>
 ```dart
-import 'package:image_picker_platform_interface/image_picker_platform_interface.dart';
+import 'package:image_picker_plus_platform_interface/image_picker_plus_platform_interface.dart';
 // ···
 class MyCameraDelegate extends ImagePickerCameraDelegate {
   @override
@@ -144,7 +146,7 @@ void setUpCameraDelegate() {
 }
 ```
 
-Once you have set a `cameraDelegate`, `image_picker` calls with
+Once you have set a `cameraDelegate`, `image_picker_pluz` calls with
 `ImageSource.camera` will work as normal, calling your provided delegate. We
 encourage the community to build packages that implement
 `ImagePickerCameraDelegate`, to provide options for desktop camera UI.
@@ -177,7 +179,7 @@ final XFile? galleryVideo = await picker.pickVideo(
 final XFile? cameraVideo = await picker.pickVideo(source: ImageSource.camera);
 // Pick multiple images.
 final List<XFile> images = await picker.pickMultiImage();
-// Pick singe image or video.
+// Pick a single image or video.
 final XFile? media = await picker.pickMedia();
 // Pick multiple images and videos.
 final List<XFile> medias = await picker.pickMultipleMedia();
@@ -185,8 +187,8 @@ final List<XFile> medias = await picker.pickMultipleMedia();
 
 ## Migrating to 1.0
 
-Starting with version 0.8.2 of the image_picker plugin, new methods were
-added that return `XFile` instances (from the
+Starting with version 0.8.2 of the upstream `image_picker` plugin, new methods
+were added that return `XFile` instances (from the
 [cross_file](https://pub.dev/packages/cross_file) package) rather than the
 plugin's own `PickedFile` instances. The previous methods were supported through
 0.8.9, and removed in 1.0.0.

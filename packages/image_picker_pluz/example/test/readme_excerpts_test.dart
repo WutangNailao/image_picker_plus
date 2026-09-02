@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:image_picker_example/readme_excerpts.dart';
+import 'package:image_picker_pluz_example/readme_excerpts.dart';
 import 'package:image_picker_plus_platform_interface/image_picker_plus_platform_interface.dart';
 
 void main() {

@@ -1,5 +1,5 @@
-name: image_picker_example
-description: Demonstrates how to use the image_picker plugin.
+name: image_picker_pluz_example
+description: Demonstrates how to use the image_picker_pluz plugin.
 version: 1.0.0+1
 
 environment:
@@ -12,7 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_plugin_android_lifecycle: ^2.0.1
-  image_picker_pluz: ^0.0.4
+  image_picker_pluz: ^0.0.5
   image_picker_plus_platform_interface: ^0.0.3
   mime: ^1.0.4
   video_player: ^2.14.0

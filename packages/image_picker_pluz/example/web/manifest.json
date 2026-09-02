@@ -1,11 +1,11 @@
 {
-    "name": "image_picker example",
-    "short_name": "image_picker",
+    "name": "image_picker_pluz example",
+    "short_name": "image_picker_pluz",
     "start_url": ".",
     "display": "minimal-ui",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "An example of the image_picker on the web.",
+    "description": "An example of image_picker_pluz on the web.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

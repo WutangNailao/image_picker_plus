@@ -246,7 +246,7 @@ class _MyHomePageState extends State<MyHomePage> {
             final String? mime = lookupMimeType(image.path);
 
             // Why network for web?
-            // See https://pub.dev/packages/image_picker_for_web#limitations-on-the-web-platform
+            // See https://pub.dev/packages/image_picker_plus_for_web#limitations-on-the-web-platform
             return Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
