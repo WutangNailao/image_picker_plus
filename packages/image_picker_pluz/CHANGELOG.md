@@ -1,5 +1,11 @@
+## 0.0.6
+
+* Update `image_picker_plus_ios` to `^0.0.9`.
+* Fix Swift Package Manager discovery for the iOS implementation.
+
 ## 0.0.5
 
+* Retracted because it depended on the retracted `image_picker_plus_ios` 0.0.8 release.
 * Update `image_picker_plus_android` to `^0.0.5`.
 * Migrate Android builds to AGP 9 and Android built-in Kotlin.
 * Update `image_picker_plus_ios` to `^0.0.8`.
