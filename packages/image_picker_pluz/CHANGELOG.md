@@ -1,3 +1,7 @@
+## 0.0.8
+
+* Update `image_picker_plus_ios` to `^0.0.11` so camera captures return after the native picker closes.
+
 ## 0.0.7
 
 * Update `image_picker_plus_ios` to `^0.0.10` so PHPicker results are returned only after its dismissal finishes.

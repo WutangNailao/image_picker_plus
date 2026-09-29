@@ -1,3 +1,8 @@
+## 0.0.11
+
+* Wait for camera photo and video capture to finish dismissing `UIImagePickerController` before returning results.
+* Keep delayed camera results tied to their original request so cancelled captures cannot complete a newer request.
+
 ## 0.0.10
 
 * Wait for PHPicker dismissal and media processing to finish before returning the selection result, so a subsequent native full-screen presentation can start safely.
