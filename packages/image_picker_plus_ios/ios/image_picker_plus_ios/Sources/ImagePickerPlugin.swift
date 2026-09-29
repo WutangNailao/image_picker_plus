@@ -496,7 +496,7 @@ public class ImagePickerPlugin: NSObject, FlutterPlugin, ImagePickerApi {
         maxHeight: Double?,
         imageQuality: NSNumber?,
         localIdentifier: String?
-    ) {
+    ) -> PickedMedia? {
         let savedPath = ImagePickerPhotoAssetUtil.saveImage(
             withOriginalImageData: originalImageData as Data?,
             image: image,
@@ -504,11 +504,7 @@ public class ImagePickerPlugin: NSObject, FlutterPlugin, ImagePickerApi {
             maxHeight: maxHeight.map(NSNumber.init(value:)),
             imageQuality: imageQuality
         )
-        sendCallResult(
-            pathList: savedPath != nil
-                ? [PickedMedia(path: savedPath!, localIdentifier: localIdentifier)]
-                : nil
-        )
+        return savedPath.map { PickedMedia(path: $0, localIdentifier: localIdentifier) }
     }
 
     private func saveImage(
@@ -516,13 +512,9 @@ public class ImagePickerPlugin: NSObject, FlutterPlugin, ImagePickerApi {
         image: UIImage,
         imageQuality: NSNumber?,
         localIdentifier: String?
-    ) {
+    ) -> PickedMedia? {
         let savedPath = ImagePickerPhotoAssetUtil.saveImage(with: pickerInfo, image: image, imageQuality: imageQuality)
-        sendCallResult(
-            pathList: savedPath != nil
-                ? [PickedMedia(path: savedPath!, localIdentifier: localIdentifier)]
-                : nil
-        )
+        return savedPath.map { PickedMedia(path: $0, localIdentifier: localIdentifier) }
     }
 }
 
@@ -628,17 +620,31 @@ extension ImagePickerPlugin: UIImagePickerControllerDelegate, UINavigationContro
     public func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
         let videoURL = info[.mediaURL] as? URL
         let localIdentifier = (info[.phAsset] as? PHAsset)?.localIdentifier
-        picker.dismiss(animated: true)
-
-        guard callContext != nil else { return }
+        guard let context = callContext else {
+            picker.dismiss(animated: true)
+            return
+        }
+        let dismissal = DispatchGroup()
+        dismissal.enter()
+        picker.dismiss(animated: true) {
+            dismissal.leave()
+        }
+        let finish: ([PickedMedia]?, Error?) -> Void = { [weak self] media, error in
+            dismissal.notify(queue: .main) { [weak self] in
+                guard let self, self.callContext === context else { return }
+                if let error {
+                    self.sendCallResult(error: error)
+                } else {
+                    self.sendCallResult(pathList: media)
+                }
+            }
+        }
 
         if let videoURL = videoURL {
             if let destination = ImagePickerPhotoAssetUtil.saveVideo(from: videoURL) {
-                sendCallResult(
-                    pathList: [PickedMedia(path: destination.path, localIdentifier: localIdentifier)]
-                )
+                finish([PickedMedia(path: destination.path, localIdentifier: localIdentifier)], nil)
             } else {
-                sendCallResult(error: PigeonError(code: "flutter_image_picker_copy_video_error", message: "Could not cache the video file.", details: nil))
+                finish(nil, PigeonError(code: "flutter_image_picker_copy_video_error", message: "Could not cache the video file.", details: nil))
             }
         } else {
             var image = info[.editedImage] as? UIImage
@@ -647,13 +653,13 @@ extension ImagePickerPlugin: UIImagePickerControllerDelegate, UINavigationContro
             }
 
             guard let finalImage = image else {
-                sendCallResult(pathList: nil)
+                finish(nil, nil)
                 return
             }
 
-            let maxWidth = callContext?.maxSize?.width
-            let maxHeight = callContext?.maxSize?.height
-            let imageQuality = callContext?.imageQuality
+            let maxWidth = context.maxSize?.width
+            let maxHeight = context.maxSize?.height
+            let imageQuality = context.imageQuality
             let desiredImageQuality = getDesiredImageQuality(imageQuality)
 
             var scaledImage = finalImage
@@ -667,7 +673,7 @@ extension ImagePickerPlugin: UIImagePickerControllerDelegate, UINavigationContro
             }
 
             var originalAsset: PHAsset?
-            if callContext?.requestFullMetadata == true {
+            if context.requestFullMetadata {
                 originalAsset = info[.phAsset] as? PHAsset
             }
 
@@ -675,16 +681,17 @@ extension ImagePickerPlugin: UIImagePickerControllerDelegate, UINavigationContro
                 let infoDict = info.reduce(into: [String: Any]()) { result, pair in
                     result[pair.key.rawValue] = pair.value
                 }
-                saveImage(
+                let media = saveImage(
                     with: infoDict,
                     image: scaledImage,
                     imageQuality: desiredImageQuality,
                     localIdentifier: localIdentifier
                 )
+                finish(media.map { [$0] }, nil)
             } else {
                 let options = PHImageRequestOptions()
                 PHImageManager.default().requestImageDataAndOrientation(for: originalAsset!, options: options) { [weak self] imageData, _, _, _ in
-                    self?.saveImage(
+                    let media = self?.saveImage(
                         with: imageData as NSData?,
                         image: scaledImage,
                         maxWidth: maxWidth,
@@ -692,14 +699,18 @@ extension ImagePickerPlugin: UIImagePickerControllerDelegate, UINavigationContro
                         imageQuality: desiredImageQuality,
                         localIdentifier: originalAsset?.localIdentifier
                     )
+                    finish(media.map { [$0] }, nil)
                 }
             }
         }
     }
 
     public func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-        picker.dismiss(animated: true)
-        sendCallResult(pathList: nil)
+        let context = callContext
+        picker.dismiss(animated: true) { [weak self] in
+            guard let self, let context, self.callContext === context else { return }
+            self.sendCallResult(pathList: nil)
+        }
     }
 }
 
