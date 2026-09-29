@@ -87,6 +87,8 @@ public class ImagePickerPlugin: NSObject, FlutterPlugin, ImagePickerApi {
     private var imagePickerControllerOverrides: [UIImagePickerController]?
     private let viewProvider: ViewProvider
     private var callContext: ImagePickerMethodCallContext?
+    private weak var activePhotoPicker: PHPickerViewController?
+    private weak var finishingPhotoPicker: PHPickerViewController?
 
     public static func register(with registrar: FlutterPluginRegistrar) {
         let instance = ImagePickerPlugin(viewProvider: DefaultViewProvider(registrar: registrar))
@@ -152,6 +154,7 @@ public class ImagePickerPlugin: NSObject, FlutterPlugin, ImagePickerApi {
         pickerViewController.delegate = self
         pickerViewController.presentationController?.delegate = self
         self.callContext = context
+        activePhotoPicker = pickerViewController
 
         _ = showPhotoLibrary(with: pickerViewController)
     }
@@ -336,6 +339,8 @@ public class ImagePickerPlugin: NSObject, FlutterPlugin, ImagePickerApi {
             sendCallResult(error: PigeonError(code: "multiple_request", message: "Cancelled by a second request", details: nil))
             callContext = nil
         }
+        activePhotoPicker = nil
+        finishingPhotoPicker = nil
     }
 
     private func showCamera(_ device: UIImagePickerController.CameraDevice, with imagePickerController: UIImagePickerController) {
@@ -467,6 +472,21 @@ public class ImagePickerPlugin: NSObject, FlutterPlugin, ImagePickerApi {
         callContext = nil
     }
 
+    private func sendPhotoPickerResult(
+        for context: ImagePickerMethodCallContext,
+        pathList: [PickedMedia]? = nil,
+        error: Error? = nil
+    ) {
+        guard callContext === context else { return }
+        activePhotoPicker = nil
+        finishingPhotoPicker = nil
+        if let error {
+            sendCallResult(error: error)
+        } else {
+            sendCallResult(pathList: pathList)
+        }
+    }
+
     // MARK: - Image Saving
 
     private func saveImage(
@@ -510,7 +530,10 @@ public class ImagePickerPlugin: NSObject, FlutterPlugin, ImagePickerApi {
 
 extension ImagePickerPlugin: UIAdaptivePresentationControllerDelegate {
     public func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
-        sendCallResult(pathList: nil)
+        guard let activePhotoPicker, presentationController.presentedViewController === activePhotoPicker else { return }
+        if presentationController.presentedViewController === finishingPhotoPicker { return }
+        guard let context = callContext else { return }
+        sendPhotoPickerResult(for: context)
     }
 }
 
@@ -518,10 +541,22 @@ extension ImagePickerPlugin: UIAdaptivePresentationControllerDelegate {
 
 extension ImagePickerPlugin: PHPickerViewControllerDelegate {
     public func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
-        picker.dismiss(animated: true)
+        guard picker === activePhotoPicker, let currentCallContext = callContext else {
+            picker.dismiss(animated: true)
+            return
+        }
+        finishingPhotoPicker = picker
+        let dismissal = DispatchGroup()
+        dismissal.enter()
+        picker.dismiss(animated: true) {
+            dismissal.leave()
+        }
 
         if results.isEmpty {
-            sendCallResult(pathList: nil)
+            dismissal.notify(queue: .main) { [weak self] in
+                guard let self, self.callContext === currentCallContext else { return }
+                self.sendPhotoPickerResult(for: currentCallContext)
+            }
             return
         }
 
@@ -529,8 +564,6 @@ extension ImagePickerPlugin: PHPickerViewControllerDelegate {
         saveQueue.name = "Flutter Save Image Queue"
         saveQueue.qualityOfService = .userInitiated
         saveQueue.maxConcurrentOperationCount = 10
-
-        guard let currentCallContext = callContext else { return }
 
         let maxWidth = currentCallContext.maxSize?.width
         let maxHeight = currentCallContext.maxSize?.height
@@ -542,14 +575,17 @@ extension ImagePickerPlugin: PHPickerViewControllerDelegate {
         var saveError: Error?
 
         let sendListOperation = BlockOperation { [weak self] in
-            if let error = saveError {
-                self?.sendCallResult(error: error)
-            } else {
-                let validResults = pathList.compactMap { $0 }
-                if validResults.count == pathList.count {
-                    self?.sendCallResult(pathList: validResults)
+            dismissal.notify(queue: .main) {
+                guard let self, self.callContext === currentCallContext else { return }
+                if let error = saveError {
+                    self.sendPhotoPickerResult(for: currentCallContext, error: error)
                 } else {
-                    self?.sendCallResult(error: PigeonError(code: "create_error", message: "Failed to save some images", details: nil))
+                    let validResults = pathList.compactMap { $0 }
+                    if validResults.count == pathList.count {
+                        self.sendPhotoPickerResult(for: currentCallContext, pathList: validResults)
+                    } else {
+                        self.sendPhotoPickerResult(for: currentCallContext, error: PigeonError(code: "create_error", message: "Failed to save some images", details: nil))
+                    }
                 }
             }
         }
