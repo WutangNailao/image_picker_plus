@@ -1,3 +1,8 @@
+## 0.0.10
+
+* Wait for PHPicker dismissal and media processing to finish before returning the selection result, so a subsequent native full-screen presentation can start safely.
+* Ignore stale picker callbacks from cancelled requests.
+
 ## 0.0.9
 
 * Rename the Swift package directory to `ios/image_picker_plus_ios` so Flutter can detect Swift Package Manager support.
